@@ -1,0 +1,15 @@
+coverage
+cloudpickle
+future
+flaky
+keras_applications
+keras_preprocessing
+sacremoses
+pytest
+pytest-cache
+pytest-cov
+pytest-forked
+pytest-pep8
+pytest-xdist
+pyux
+pyyaml

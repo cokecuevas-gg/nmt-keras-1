@@ -1,0 +1,13 @@
+numpy
+six
+toolz
+cloudpickle
+matplotlib
+sacremoses
+scipy
+future
+cython
+keras_applications
+keras_preprocessing
+sklearn
+tables
