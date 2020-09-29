@@ -351,14 +351,8 @@ def build_dataset_multilanguage(params):
     else:
         # We can easily recover it with a single line
         ds = loadDataset(params['DATASET_STORE_PATH'] + '/Dataset_' + params['DATASET_NAME'] + '_' + params['SRC_LAN'] + params['TRG_LAN'] + '.pkl')
-
-                # Prepare references
-                prepare_references(ds,
-                                repeat=1,
-                                n=1,
-                                set_names=params['EVAL_ON_SETS'])
-
-        return datasets
+        prepare_references(ds,repeat=1,n=1,set_names=params['EVAL_ON_SETS'])
+    return datasets
 
 def keep_n_captions(ds, repeat, n=1, set_names=None):
     """
