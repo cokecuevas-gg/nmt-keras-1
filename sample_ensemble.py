@@ -29,6 +29,7 @@ def parse_args():
                                                            "By default, it applies the same weight to each model (1/N).", default=[])
     parser.add_argument("-g", "--glossary", required=False, help="Glossary file for overwriting translations.")
     parser.add_argument("-m", "--models", nargs="+", required=True, help="Path to the models")
+    parser.add_argument("-dn", "--dataset_number", nargs="+", required=True, help="Data set number")
     parser.add_argument("-ch", "--changes", nargs="*", help="Changes to the config. Following the syntax Key=Value",
                         default="")
     return parser.parse_args()
@@ -59,4 +60,5 @@ if __name__ == "__main__":
         print ('Error processing arguments: (', k, ",", v, ")")
         exit(2)
     params = check_params(params)
+    params['DATASET_NUMBER'] = args.dataset_number[0]
     sample_ensemble(args, params)

@@ -17,8 +17,9 @@ def load_parameters():
     TRG_LAN = 'es'
     SRCS_LAN = ['en']
     TRGS_LAN = ['es','fr']                                 # Language of the target text.
-    DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuTrans' #% (TA, DATASET_NAME)  # Path where data is stored.
-    #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/nmt-keras/examples/EuTrans'
+    #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuroTrans_full' #% (TA, DATASET_NAME)  # Path where data is stored.
+    DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/nmt-keras/examples/EuTrans'
+    #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuTrans'
     MULTILANGUAGE = 1
     # SRC_LAN or TRG_LAN will be added to the file names.
     TEXT_FILES = {'train': 'training.',             # Data files.
@@ -29,16 +30,16 @@ def load_parameters():
 
     # Dataset class parameters
     INPUTS_IDS_DATASET = ['source_text','state_below']        # Corresponding inputs of the dataset.
-    OUTPUTS_IDS_DATASET = ['target_text_es','target_text_fr']                      # Corresponding outputs of the dataset.
+    OUTPUTS_IDS_DATASET = ['target_text']                      # Corresponding outputs of the dataset.
     INPUTS_IDS_MODEL = ['source_text','state_below']          # Corresponding inputs of the built model.
-    OUTPUTS_IDS_MODEL = ['target_text_es','target_text_fr']                        # Corresponding outputs of the built model.
+    OUTPUTS_IDS_MODEL = ['target_text',]                        # Corresponding outputs of the built model.
     INPUTS_TYPES_DATASET = ['text-features', 'text-features']  # Corresponding types of the data. 'text' or 'text-features' allowed.
     OUTPUTS_TYPES_DATASET = ['text-features']                  # They are equivalent, only differ on how the data is loaded.
 
     # Evaluation params
     METRICS = ['coco']                            # Metric used for evaluating the model.
     EVAL_ON_SETS = ['val']                        # Possible values: 'train', 'val' and 'test' (external evaluator).
-    EVAL_ON_SETS_KERAS = ['val']                       # Possible values: 'train', 'val' and 'test' (Keras' evaluator). Untested..
+    EVAL_ON_SETS_KERAS = ['val']                  # Possible values: 'train', 'val' and 'test' (Keras' evaluator). Untested..
     START_EVAL_ON_EPOCH = 1                       # First epoch to start the model evaluation.
     EVAL_EACH_EPOCHS = True                       # Select whether evaluate between N epochs or N updates.
     EVAL_EACH = 1                                 # Sets the evaluation frequency (epochs or updates).
@@ -132,7 +133,7 @@ def load_parameters():
     LABEL_SMOOTHING = 0.                          # Epsilon value for label smoothing. Only valid for 'categorical_crossentropy' loss. See arxiv.org/abs/1512.00567.
 
     OPTIMIZER = 'Adam'                            # Optimizer. Supported optimizers: SGD, RMSprop, Adagrad, Adadelta, Adam, Adamax, Nadam.
-    LR = 0.001                                    # Learning rate. Recommended values - Adam 0.0002 - Adadelta 1.0.
+    LR = 0.0002                                  # Learning rate. Recommended values - Adam 0.0002 - Adadelta 1.0.
     CLIP_C = 1.                                   # During training, clip L2 norm of gradients to this value (0. means deactivated).
     CLIP_V = 0.                                   # During training, clip absolute value of gradients to this value (0. means deactivated).
     USE_TF_OPTIMIZER = True                       # Use native Tensorflow's optimizer (only for the Tensorflow backend).
@@ -162,8 +163,8 @@ def load_parameters():
     MIN_LR = 1e-9                                 # Minimum value allowed for the decayed LR
 
     # Training parameters
-    MAX_EPOCH = 2                               # Stop when computed this number of epochs.
-    BATCH_SIZE =  1                             # Size of each minibatch.
+    MAX_EPOCH = 5                               # Stop when computed this number of epochs.
+    BATCH_SIZE =  128                            # Size of each minibatch.
     N_GPUS = 1                                    # Number of GPUs to use. Only for Tensorflow backend. Each GPU will receive mini-batches of BATCH_SIZE / N_GPUS.
 
     HOMOGENEOUS_BATCHES = False                   # Use batches with homogeneous output lengths (Dangerous!!).

@@ -265,11 +265,11 @@ def build_dataset_multilanguage(params):
                 print("______________OUTPUT___________________")
                 # OUTPUT DATA
                 # Load the train, val and test splits of the target language sentences (outputs). The files include a sentence per line.
-                print(base_path + '/' + params['TEXT_FILES']['train'] + target_l+"."+target_l,params['OUTPUTS_IDS_DATASET'][i])
+                print(base_path + '/' + params['TEXT_FILES']['train'] + target_l+"."+target_l)
                 ds.setOutput(base_path + '/' + params['TEXT_FILES']['train'] + target_l+"."+target_l,
                             'train',
                             type=params.get('OUTPUTS_TYPES_DATASET', ['dense-text'] if 'sparse' in params['LOSS'] else ['text'])[0],
-                            id=params['OUTPUTS_IDS_DATASET'][i],
+                            id=params['OUTPUTS_IDS_DATASET'][0],
                             tokenization=params.get('TOKENIZATION_METHOD', 'tokenize_none'),
                             build_vocabulary=True,
                             pad_on_batch=params.get('PAD_ON_BATCH', True),
@@ -281,19 +281,19 @@ def build_dataset_multilanguage(params):
                             bpe_codes=params.get('BPE_CODES_PATH', None),
                             label_smoothing=params.get('LABEL_SMOOTHING', 0.))
                 if params.get('ALIGN_FROM_RAW', True) and not params.get('HOMOGENEOUS_BATCHES', False):
-                    print(base_path + '/' + params['TEXT_FILES']['train'] + target_l+"."+target_l,params['OUTPUTS_IDS_DATASET'][i])
+                    print(base_path + '/' + params['TEXT_FILES']['train'] + target_l+"."+target_l,params['OUTPUTS_IDS_DATASET'][0])
                     ds.setRawOutput(base_path + '/' + params['TEXT_FILES']['train'] + target_l+"."+target_l,
                                     'train',
                                     type='file-name',
-                                    id='raw_' + params['OUTPUTS_IDS_DATASET'][i],)
+                                    id='raw_' + params['OUTPUTS_IDS_DATASET'][0],)
 
                 for split in ['val', 'test']:
                     if params['TEXT_FILES'].get(split) is not None:
-                        print(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+target_l,params['OUTPUTS_IDS_DATASET'][i])
+                        print(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+target_l,params['OUTPUTS_IDS_DATASET'][0])
                         ds.setOutput(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+target_l,
                                     split,
                                     type='text',  # The type of the references should be always 'text'
-                                    id=params['OUTPUTS_IDS_DATASET'][i],
+                                    id=params['OUTPUTS_IDS_DATASET'][0],
                                     pad_on_batch=params.get('PAD_ON_BATCH', True),
                                     tokenization=params.get('TOKENIZATION_METHOD', 'tokenize_none'),
                                     sample_weights=params.get('SAMPLE_WEIGHTS', True),
@@ -302,11 +302,11 @@ def build_dataset_multilanguage(params):
                                     bpe_codes=params.get('BPE_CODES_PATH', None),
                                     label_smoothing=0.)
                         if params.get('ALIGN_FROM_RAW', True) and not params.get('HOMOGENEOUS_BATCHES', False):
-                            print(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+target_l, params['OUTPUTS_IDS_DATASET'][i])
+                            print(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+target_l, params['OUTPUTS_IDS_DATASET'][0])
                             ds.setRawOutput(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+target_l,
                                             split,
                                             type='file-name',
-                                            id='raw_' + params['OUTPUTS_IDS_DATASET'][i])
+                                            id='raw_' + params['OUTPUTS_IDS_DATASET'][0])
 
                 # INPUT DATA
                 # We must ensure that the 'train' split is the first (for building the vocabulary)
@@ -333,11 +333,11 @@ def build_dataset_multilanguage(params):
 
                         if len(params['INPUTS_IDS_DATASET']) > 1:
                             if 'train' in split:
-                                print(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+target_l,"state_below"+"_"+str(i))
+                                print(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+target_l)
                                 ds.setInput(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+target_l,
                                             split,
                                             type=params.get('INPUTS_TYPES_DATASET', ['text', 'text'])[1],
-                                            id="state_below"+"_"+str(i),
+                                            id=params['INPUTS_IDS_DATASET'][1],
                                             required=False,
                                             tokenization=params.get('TOKENIZATION_METHOD', 'tokenize_none'),
                                             pad_on_batch=params.get('PAD_ON_BATCH', True),
@@ -348,15 +348,15 @@ def build_dataset_multilanguage(params):
                                             max_words=params.get('OUTPUT_VOCABULARY_SIZE', 0),
                                             bpe_codes=params.get('BPE_CODES_PATH', None))
                                 if params.get('TIE_EMBEDDINGS', False):
-                                    ds.merge_vocabularies(["state_below"+"_"+i, params['INPUTS_IDS_DATASET'][0]])
+                                    ds.merge_vocabularies([['INPUTS_IDS_DATASET'][1], params['INPUTS_IDS_DATASET'][0]])
                             else:
                                 ds.setInput(None,
                                             split,
                                             type='ghost',
-                                            id=params['INPUTS_IDS_DATASET'][-1]+"_"+str(i),
+                                            id=params['INPUTS_IDS_DATASET'][-1],
                                             required=False)
                         if params.get('ALIGN_FROM_RAW', True) and not params.get('HOMOGENEOUS_BATCHES', False):
-                            print(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+ params['SRC_LAN'],params['INPUTS_IDS_DATASET'][0])
+                            print(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+ params['SRC_LAN'])
                             ds.setRawInput(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+ params['SRC_LAN'],
                                         split,
                                         type='file-name',

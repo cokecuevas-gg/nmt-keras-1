@@ -12,6 +12,7 @@ except:
 
 def beam_search(model, X, params, return_alphas=False, eos_sym=0, null_sym=2, model_ensemble=False, n_models=0):
     """
+    aqui 1
     Beam search method for Cond models.
     (https://en.wikibooks.org/wiki/Artificial_Intelligence/Search/Heuristic_search/Beam_search)
     The algorithm in a nutshell does the following:
@@ -45,6 +46,7 @@ def beam_search(model, X, params, return_alphas=False, eos_sym=0, null_sym=2, mo
     :param n_models; Number of models in the ensemble.
     :return: UNSORTED list of [k_best_samples, k_best_scores] (k: beam size)
     """
+    #print(model.name)
     k = params['beam_size']
     samples = []
     sample_scores = []
@@ -81,7 +83,7 @@ def beam_search(model, X, params, return_alphas=False, eos_sym=0, null_sym=2, mo
     else:
         state_below = np.asarray([null_sym] * live_k) if pad_on_batch else np.asarray([np.zeros(params['state_below_maxlen']) + null_sym] * live_k)
     prev_out = [None] * n_models if model_ensemble else None
-
+    
     for ii in range(maxlen):
         # for every possible live sample calc prob for every possible label
         if params['optimized_search']:  # use optimized search model if available

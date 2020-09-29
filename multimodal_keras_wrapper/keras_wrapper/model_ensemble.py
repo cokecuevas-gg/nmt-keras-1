@@ -48,6 +48,7 @@ class BeamSearchEnsemble:
     # PREDICTION FUNCTIONS: Functions for making prediction on input samples
     def predict_cond_optimized(self, X, states_below, params, ii, prev_outs):
         """
+        aqui 2
         Call the prediction functions of all models, according to their inputs
         :param X: Input data
         :param states_below: Previously generated words (in case of conditional models)
@@ -482,6 +483,11 @@ class BeamSearchEnsemble:
                 if pad_on_batch else np.asarray([np.zeros(params['state_below_maxlen']) + null_sym])
 
         prev_outs = [None] * len(self.models)
+        print(X)
+        print("::::::::::::::::::")
+        print(Y)
+        print(":::::::::::::::")
+        print(state_below)
         for ii in range(len(Y)):
             # for every possible live sample calc prob for every possible label
             if self.optimized_search:  # use optimized search model if available

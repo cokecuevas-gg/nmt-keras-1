@@ -613,7 +613,7 @@ class StoreModel(KerasCallback):
     """
     Saves a model into disk.
     """
-    def __init__(self, model, fun, epochs_for_save, verbose=0):
+    def __init__(self, model, fun, epochs_for_save,verbose=0):
         """
             model - model to save
             fun - function for saving the model

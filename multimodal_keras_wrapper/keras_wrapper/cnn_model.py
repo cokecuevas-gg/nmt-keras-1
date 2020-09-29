@@ -23,7 +23,7 @@ from keras.models import Sequential, model_from_json, load_model
 from keras.optimizers import *
 from keras.regularizers import l2
 from keras.utils.layer_utils import print_summary
-from keras_wrapper.dataset import Data_Batch_Generator, Homogeneous_Data_Batch_Generator, Parallel_Data_Batch_Generator,Data_Batch_Generator_Multi_Dataset
+from keras_wrapper.dataset import Data_Batch_Generator, Homogeneous_Data_Batch_Generator, Parallel_Data_Batch_Generator
 from keras_wrapper.extra.callbacks import *
 from keras_wrapper.extra.read_write import file2list
 from keras_wrapper.utils import one_hot_2_indices, decode_predictions, decode_predictions_one_hot, \
@@ -65,19 +65,19 @@ def saveModel(model_wrapper, update_num, path=None, full_path=False, store_iter=
     """
     if not path:
         path = model_wrapper.model_path
-
     iteration = str(update_num)
-
+    model_number = str(model_wrapper.model_language)
+    print("guardando algo",model_number)
     if full_path:
         if store_iter:
-            model_name = path + '_' + iteration
+            model_name = path + '_' + iteration + '_' + model_number
         else:
-            model_name = path
+            model_name = path + '_' + model_number
     else:
         if store_iter:
-            model_name = path + '/update_' + iteration
+            model_name = path + '/update_' + iteration + '_' + model_number
         else:
-            model_name = path + '/epoch_' + iteration
+            model_name = path + '/epoch_' + iteration + '_' + model_number
 
     if not model_wrapper.silence:
         logger.info("<<< Saving model to " + model_name + " ... >>>")
@@ -88,40 +88,74 @@ def saveModel(model_wrapper, update_num, path=None, full_path=False, store_iter=
             os.makedirs(os.path.dirname(path))
 
     try:  # Try to save model at one time
-        model_wrapper.model.save(model_name + '.h5')
+        model_number = int(model_number)
+        if model_number == 0:
+            model_wrapper.model.save(model_name + '.h5')
+        else:
+            model_wrapper.model2.save(model_name + '.h5')
     except Exception as e:  # Split saving in model structure / weights
         logger.info(str(e))
         # Save model structure
-        json_string = model_wrapper.model.to_json()
+        if model_number == 0:
+            json_string = model_wrapper.model.to_json()
+        else:
+            json_string = model_wrapper.model2.to_json()
         open(model_name + '_structure.json', 'w').write(json_string)
         # Save model weights
-        model_wrapper.model.save_weights(model_name + '_weights.h5', overwrite=True)
+        if model_number == 0:
+            model_wrapper.model.save_weights(model_name + '_weights.h5', overwrite=True)
+        else:
+            model_wrapper.model2.save_weights(model_name + '_weights.h5', overwrite=True)
 
     # Save auxiliary models for optimized search
-    if model_wrapper.model_init is not None:
-        try:  # Try to save model at one time
-            model_wrapper.model_init.save(model_name + '_init.h5')
-        except Exception as e:  # Split saving in model structure / weights
-            logger.info(str(e))
-            # Save model structure
-            logger.info("<<< Saving model_init to " + model_name + "_structure_init.json... >>>")
-            json_string = model_wrapper.model_init.to_json()
-            open(model_name + '_structure_init.json', 'w').write(json_string)
-            # Save model weights
-            model_wrapper.model_init.save_weights(model_name + '_weights_init.h5', overwrite=True)
-
-    if model_wrapper.model_next is not None:
-        try:  # Try to save model at one time
-            model_wrapper.model_next.save(model_name + '_next.h5')
-        except Exception as e:  # Split saving in model structure / weights
-            logger.info(str(e))
-            # Save model structure
-            logger.info("<<< Saving model_next to " + model_name + "_structure_next.json... >>>")
-            json_string = model_wrapper.model_next.to_json()
-            open(model_name + '_structure_next.json', 'w').write(json_string)
-            # Save model weights
-            model_wrapper.model_next.save_weights(model_name + '_weights_next.h5', overwrite=True)
-
+    if model_number == 0:
+        if model_wrapper.model_init is not None:
+            try:  # Try to save model at one time
+                model_wrapper.model_init.save(model_name + '_init.h5')
+            except Exception as e:  # Split saving in model structure / weights
+                logger.info(str(e))
+                # Save model structure
+                logger.info("<<< Saving model_init to " + model_name + "_structure_init.json... >>>")
+                json_string = model_wrapper.model_init.to_json()
+                open(model_name + '_structure_init.json', 'w').write(json_string)
+                # Save model weights
+                model_wrapper.model_init.save_weights(model_name + '_weights_init.h5', overwrite=True)
+    else:
+        if model_wrapper.model_init2 is not None:
+            try:  # Try to save model at one time
+                model_wrapper.model_init2.save(model_name + '_init.h5')
+            except Exception as e:  # Split saving in model structure / weights
+                logger.info(str(e))
+                # Save model structure
+                logger.info("<<< Saving model_init2 to " + model_name + "_structure_init.json... >>>")
+                json_string = model_wrapper.model_init2.to_json()
+                open(model_name + '_structure_init.json', 'w').write(json_string)
+                # Save model weights
+                model_wrapper.model_init2.save_weights(model_name + '_weights_init.h5', overwrite=True)
+    if model_number == 0:
+        if model_wrapper.model_next is not None:
+            try:  # Try to save model at one time
+                model_wrapper.model_next.save(model_name + '_next.h5')
+            except Exception as e:  # Split saving in model structure / weights
+                logger.info(str(e))
+                # Save model structure
+                logger.info("<<< Saving model_next to " + model_name + "_structure_next.json... >>>")
+                json_string = model_wrapper.model_next.to_json()
+                open(model_name + '_structure_next.json', 'w').write(json_string)
+                # Save model weights
+                model_wrapper.model_next.save_weights(model_name + '_weights_next.h5', overwrite=True)
+    else:
+        if model_wrapper.model_next2 is not None:
+            try:  # Try to save model at one time
+                model_wrapper.model_next2.save(model_name + '_next.h5')
+            except Exception as e:  # Split saving in model structure / weights
+                logger.info(str(e))
+                # Save model structure
+                logger.info("<<< Saving model_next2 to " + model_name + "_structure_next.json... >>>")
+                json_string = model_wrapper.model_next2.to_json()
+                open(model_name + '_structure_next.json', 'w').write(json_string)
+                # Save model weights
+                model_wrapper.model_next2.save_weights(model_name + '_weights_next.h5', overwrite=True)
     # Save additional information
     backup_multi_gpu_model = None
     if hasattr(model_wrapper, 'multi_gpu_model'):
@@ -910,6 +944,7 @@ class Model_Wrapper(object):
         if parameters is None:
             parameters = dict()
         multi_params = []
+        #por cada dataset
         if isinstance(ds, list):
             for parameter in parameters:
                 params = checkParameters(parameter, self.default_training_params, hard_check=True)
@@ -921,7 +956,7 @@ class Model_Wrapper(object):
                 self.training_parameters.append(save_params)
                 multi_params.append(params)
             
-            logger.info("<<< Training model >>>")
+            logger.info("<<< Training multi model >>>")
             self.__train_multi_decoder(ds,multi_params)
         else:
             params = checkParameters(parameters, self.default_training_params, hard_check=True)
@@ -1137,8 +1172,8 @@ class Model_Wrapper(object):
             model_to_train = self.multi_gpu_model
         else:
             model_to_train = self.model
-        print(np.shape(train_gen))
-        print(train_gen)
+            model_to_train2 = self.model2
+        
         if int(keras.__version__.split('.')[0]) == 1:
             # Keras 1.x version
             model_to_train.fit_generator(train_gen,
@@ -1164,6 +1199,16 @@ class Model_Wrapper(object):
                                          max_queue_size=params['n_parallel_loaders'],
                                          workers=1,
                                          initial_epoch=params['epoch_offset'])
+            model_to_train2.fit_generator(train_gen,
+                                         steps_per_epoch=state['n_iterations_per_epoch'],
+                                         epochs=params['n_epochs'],
+                                         verbose=params['verbose'],
+                                         validation_data=val_gen,
+                                         validation_steps=n_valid_samples,
+                                         class_weight=class_weight,
+                                         max_queue_size=params['n_parallel_loaders'],
+                                         workers=1,
+                                         initial_epoch=params['epoch_offset'])
 
     def __train_multi_decoder(self, ds, multi_params, state=None):
         if state is None:
@@ -1179,7 +1224,7 @@ class Model_Wrapper(object):
 
         # Prepare callbacks
         multi_callbacks = []
-        for params in multi_params:
+        for n,params in enumerate(multi_params):
             callbacks = []
             # Extra callbacks (e.g. evaluation)
             callbacks += params['extra_callbacks']
@@ -1211,7 +1256,7 @@ class Model_Wrapper(object):
                 callbacks.append(callback_early_stop)
             # Store model
             if params['epochs_for_save'] >= 0:
-                callback_store_model = StoreModelWeightsOnEpochEnd(self, saveModel, params['epochs_for_save'])
+                callback_store_model = StoreModelWeightsOnEpochEnd(self, saveModel, params['epochs_for_save'],n)
                 callbacks.insert(0, callback_store_model)
             # Tensorboard callback
             if params['tensorboard'] and K.backend() == 'tensorflow':
@@ -1252,27 +1297,26 @@ class Model_Wrapper(object):
 
         # Prepare data generators
         trains_gen = []
-        for i,d in enumerate(ds):
+        for dataset in ds:
             train_gen = Data_Batch_Generator('train',
-                                                self,
-                                                d,
-                                                state['n_iterations_per_epoch'],
-                                                batch_size=params['batch_size'],
-                                                normalization=params['normalize'],
-                                                normalization_type=params['normalization_type'],
-                                                data_augmentation=params['data_augmentation'],
-                                                wo_da_patch_type=params['wo_da_patch_type'],
-                                                da_patch_type=params['da_patch_type'],
-                                                da_enhance_list=params['da_enhance_list'],
-                                                mean_substraction=params['mean_substraction'],
-                                                shuffle=params['shuffle'],dataset_number=i).generator()
+                                                    self,
+                                                    dataset,
+                                                    state['n_iterations_per_epoch'],
+                                                    batch_size=params['batch_size'],
+                                                    normalization=params['normalize'],
+                                                    normalization_type=params['normalization_type'],
+                                                    data_augmentation=params['data_augmentation'],
+                                                    wo_da_patch_type=params['wo_da_patch_type'],
+                                                    da_patch_type=params['da_patch_type'],
+                                                    da_enhance_list=params['da_enhance_list'],
+                                                    mean_substraction=params['mean_substraction'],
+                                                    shuffle=params['shuffle']).generator()
             trains_gen.append(train_gen)
-            
         # Are we going to validate on 'val' data?
         if False:  # TODO: loss calculation on val set is deactivated
             # if 'val' in params['eval_on_sets']:
             # Calculate how many validation iterations are we going to perform per test
-            n_valid_samples = ds.len_val
+            n_valid_samples = ds[0].len_val
             if params['num_iterations_val'] is None:
                 params['num_iterations_val'] = int(math.ceil(float(n_valid_samples) / params['batch_size']))
 
@@ -1307,11 +1351,11 @@ class Model_Wrapper(object):
             model_to_train = self.multi_gpu_model
         else:
             model_to_train = self.model
+            model_to_train2 = self.model2
         
-
         if int(keras.__version__.split('.')[0]) == 1:
             # Keras 1.x version
-            model_to_train.fit_generator(generators,
+            model_to_train.fit_generator(train_gen,
                                          validation_data=val_gen,
                                          nb_val_samples=n_valid_samples,
                                          class_weight=class_weight,
@@ -1323,18 +1367,33 @@ class Model_Wrapper(object):
                                          initial_epoch=params['epoch_offset'])
         else:
             # Keras 2.x version
-            for i,train_g in enumerate(trains_gen):
-                model_to_train.fit_generator(train_g,
-                                            steps_per_epoch=state['n_iterations_per_epoch'],
-                                            epochs=params['n_epochs'],
-                                            verbose=params['verbose'],
-                                            callbacks=multi_callbacks[i],
-                                            validation_data=val_gen,
-                                            validation_steps=n_valid_samples,
-                                            class_weight=class_weight,
-                                            max_queue_size=params['n_parallel_loaders'],
-                                            workers=1,
-                                            initial_epoch=params['epoch_offset'])
+            print("Se entrenará el primer lenguaje")
+            self.model_language = 0
+            model_to_train.fit_generator(trains_gen[0],
+                                         steps_per_epoch=state['n_iterations_per_epoch'],
+                                         epochs=params['n_epochs'],
+                                         verbose=params['verbose'],
+                                         callbacks=multi_callbacks[0],
+                                         validation_data=val_gen,
+                                         validation_steps=n_valid_samples,
+                                         class_weight=class_weight,
+                                         max_queue_size=params['n_parallel_loaders'],
+                                         workers=1,
+                                         initial_epoch=params['epoch_offset'])
+            print("FIN DEL PRIMER MODELO, AHORA EL SEGUNDO")
+            '''self.model_language = 1
+            model_to_train2.fit_generator(trains_gen[1],
+                                         steps_per_epoch=state['n_iterations_per_epoch'],
+                                         epochs=params['n_epochs'],
+                                         verbose=params['verbose'],
+                                         callbacks=multi_callbacks[1],
+                                         validation_data=val_gen,
+                                         validation_steps=n_valid_samples,
+                                         class_weight=class_weight,
+                                         max_queue_size=params['n_parallel_loaders'],
+                                         workers=1,
+                                         initial_epoch=params['epoch_offset'])'''
+
                                 
     def __train_from_samples(self, x, y, params, class_weight=None, sample_weight=None):
 
@@ -1589,6 +1648,7 @@ class Model_Wrapper(object):
 
     def predict_cond_optimized(self, X, states_below, params, ii, prev_out):
         """
+        aqui 2
         Returns predictions on batch given the (static) input X and the current history (states_below) at time-step ii.
         WARNING!: It's assumed that the current history (state_below) is the last input of the model!
         See Dataset class for more information
@@ -1602,111 +1662,215 @@ class Model_Wrapper(object):
         """
         in_data = {}
         n_samples = states_below.shape[0]
-
+        #print(states_below)
         ##########################################
         # Choose model to use for sampling
         ##########################################
         if ii == 0:
-            model = self.model_init
+            if self.model_language == 0 or params.get('dataset_number') == 0:
+                model = self.model_init
+            else:
+                model = self.model_init2
         else:
-            model = self.model_next
+            if self.model_language == 0 or params.get('dataset_number') == 0:
+                model = self.model_next
+            else:
+                model = self.model_next2
         ##########################################
         # Get inputs
         ##########################################
-        if ii > 1:  # timestep > 1 (model_next to model_next)
-            for idx, next_out_name in list(enumerate(self.ids_outputs_next)):
-                if idx == 0:
-                    if params.get('attend_on_output', False):
-                        if params.get('pad_on_batch', True):
-                            pass
+        if self.model_language == 0 or params.get('dataset_number') == 0:
+            if ii > 1:  # timestep > 1 (model_next to model_next)
+                for idx, next_out_name in list(enumerate(self.ids_outputs_next)):
+                    if idx == 0:
+                        if params.get('attend_on_output', False):
+                            if params.get('pad_on_batch', True):
+                                pass
+                        else:
+                            if params.get('pad_on_batch', True):
+                                states_below = states_below[:, -1].reshape(n_samples, -1)
+                        in_data[self.ids_inputs_next[0]] = states_below
+                    if idx > 0:  # first output must be the output probs.
+                        if next_out_name in list(self.matchings_next_to_next):
+                            next_in_name = self.matchings_next_to_next[next_out_name]
+                            if prev_out[idx].shape[0] == 1:
+                                prev_out[idx] = np.repeat(prev_out[idx], n_samples, axis=0)
+                            in_data[next_in_name] = prev_out[idx]
+            elif ii == 0:  # first timestep
+                for model_input in params['model_inputs']:
+                    if X[model_input].shape[0] == 1:
+                        in_data[model_input] = np.repeat(X[model_input], n_samples, axis=0)
                     else:
-                        if params.get('pad_on_batch', True):
-                            states_below = states_below[:, -1].reshape(n_samples, -1)
-                    in_data[self.ids_inputs_next[0]] = states_below
-                if idx > 0:  # first output must be the output probs.
-                    if next_out_name in list(self.matchings_next_to_next):
-                        next_in_name = self.matchings_next_to_next[next_out_name]
-                        if prev_out[idx].shape[0] == 1:
-                            prev_out[idx] = np.repeat(prev_out[idx], n_samples, axis=0)
-                        in_data[next_in_name] = prev_out[idx]
-        elif ii == 0:  # first timestep
-            for model_input in params['model_inputs']:
-                if X[model_input].shape[0] == 1:
-                    in_data[model_input] = np.repeat(X[model_input], n_samples, axis=0)
-                else:
-                    in_data[model_input] = X[model_input]
-                if params.get('pad_on_batch', True):
-                    states_below = states_below.reshape(n_samples, -1)
-            in_data[params['model_inputs'][params['state_below_index']]] = states_below
+                        in_data[model_input] = X[model_input]
+                    if params.get('pad_on_batch', True):
+                        states_below = states_below.reshape(n_samples, -1)
+                in_data[params['model_inputs'][params['state_below_index']]] = states_below
 
-        elif ii == 1:  # timestep == 1 (model_init to model_next)
-            for idx, init_out_name in list(enumerate(self.ids_outputs_init)):
-                if idx == 0:
-                    if params.get('attend_on_output', False):
-                        if params.get('pad_on_batch', True):
-                            pass
+            elif ii == 1:  # timestep == 1 (model_init to model_next)
+                for idx, init_out_name in list(enumerate(self.ids_outputs_init)):
+                    if idx == 0:
+                        if params.get('attend_on_output', False):
+                            if params.get('pad_on_batch', True):
+                                pass
+                        else:
+                            if params.get('pad_on_batch', True):
+                                states_below = states_below[:, -1].reshape(n_samples, -1)
+                        in_data[self.ids_inputs_next[0]] = states_below
+
+                    if idx > 0:  # first output must be the output probs.
+                        if init_out_name in list(self.matchings_init_to_next):
+                            next_in_name = self.matchings_init_to_next[init_out_name]
+                            if prev_out[idx].shape[0] == 1:
+                                prev_out[idx] = np.repeat(prev_out[idx], n_samples, axis=0)
+                            in_data[next_in_name] = prev_out[idx]
+
+            ##########################################
+            # Recover output identifiers
+            ##########################################
+            # in any case, the first output of the models must be the next words' probabilities
+            pick_idx = ii if params.get('attend_on_output', False) else 0
+            if ii == 0:  # optimized search model (model_init case)
+                output_ids_list = self.ids_outputs_init
+            else:  # optimized search model (model_next case)
+                output_ids_list = self.ids_outputs_next
+
+            ##########################################
+            # Apply prediction on current timestep
+            ##########################################
+            #print(in_data)
+            if params['max_batch_size'] >= n_samples:  # The model inputs beam will fit into one batch in memory
+                out_data = model.predict_on_batch(in_data)
+            else:
+                # It is possible that the model inputs don't fit into one single batch:
+                #  Make beam_batch_size-sample-sized batches
+                for i in range(0, n_samples, params['beam_batch_size']):
+                    aux_in_data = {}
+                    for k, v in iteritems(in_data):
+                        max_pos = min([i + params['beam_batch_size'], n_samples, len(v)])
+                        aux_in_data[k] = v[i:max_pos]
+                        # aux_in_data[k] = np.expand_dims(v[i], axis=0)
+                    predicted_out = model.predict_on_batch(aux_in_data)
+                    if i == 0:
+                        out_data = predicted_out
                     else:
-                        if params.get('pad_on_batch', True):
-                            states_below = states_below[:, -1].reshape(n_samples, -1)
-                    in_data[self.ids_inputs_next[0]] = states_below
+                        if len(output_ids_list) > 1:
+                            for iout in range(len(output_ids_list)):
+                                out_data[iout] = np.vstack((out_data[iout], predicted_out[iout]))
+                        else:
+                            out_data = np.vstack((out_data, predicted_out))
 
-                if idx > 0:  # first output must be the output probs.
-                    if init_out_name in list(self.matchings_init_to_next):
-                        next_in_name = self.matchings_init_to_next[init_out_name]
-                        if prev_out[idx].shape[0] == 1:
-                            prev_out[idx] = np.repeat(prev_out[idx], n_samples, axis=0)
-                        in_data[next_in_name] = prev_out[idx]
+            ##########################################
+            # Get outputs
+            ##########################################
+            if len(output_ids_list) > 1:
+                all_data = {}
+                for output_id in range(len(output_ids_list)):
+                    all_data[output_ids_list[output_id]] = cp.asarray(out_data[output_id])
+                all_data[output_ids_list[0]] = cp.asarray(all_data[output_ids_list[0]][:, pick_idx, :])
+            else:
+                all_data = {output_ids_list[0]: cp.asarray(out_data[:, pick_idx, :])}
+            probs = cp.asarray(all_data[output_ids_list[0]])
 
-        ##########################################
-        # Recover output identifiers
-        ##########################################
-        # in any case, the first output of the models must be the next words' probabilities
-        pick_idx = ii if params.get('attend_on_output', False) else 0
-        if ii == 0:  # optimized search model (model_init case)
-            output_ids_list = self.ids_outputs_init
-        else:  # optimized search model (model_next case)
-            output_ids_list = self.ids_outputs_next
-
-        ##########################################
-        # Apply prediction on current timestep
-        ##########################################
-        if params['max_batch_size'] >= n_samples:  # The model inputs beam will fit into one batch in memory
-            out_data = model.predict_on_batch(in_data)
-        else:
-            # It is possible that the model inputs don't fit into one single batch:
-            #  Make beam_batch_size-sample-sized batches
-            for i in range(0, n_samples, params['beam_batch_size']):
-                aux_in_data = {}
-                for k, v in iteritems(in_data):
-                    max_pos = min([i + params['beam_batch_size'], n_samples, len(v)])
-                    aux_in_data[k] = v[i:max_pos]
-                    # aux_in_data[k] = np.expand_dims(v[i], axis=0)
-                predicted_out = model.predict_on_batch(aux_in_data)
-                if i == 0:
-                    out_data = predicted_out
-                else:
-                    if len(output_ids_list) > 1:
-                        for iout in range(len(output_ids_list)):
-                            out_data[iout] = np.vstack((out_data[iout], predicted_out[iout]))
+            ##########################################
+            # Define returned data
+            ##########################################
+            return [probs, out_data]
+        else: 
+            if ii > 1:  # timestep > 1 (model_next to model_next)
+                for idx, next_out_name in list(enumerate(self.ids_outputs_next_2)):
+                    if idx == 0:
+                        if params.get('attend_on_output', False):
+                            if params.get('pad_on_batch', True):
+                                pass
+                        else:
+                            if params.get('pad_on_batch', True):
+                                states_below = states_below[:, -1].reshape(n_samples, -1)
+                        in_data[self.ids_inputs_next_2[0]] = states_below
+                    if idx > 0:  # first output must be the output probs.
+                        if next_out_name in list(self.matchings_next_to_next_2):
+                            next_in_name = self.matchings_next_to_next_2[next_out_name]
+                            if prev_out[idx].shape[0] == 1:
+                                prev_out[idx] = np.repeat(prev_out[idx], n_samples, axis=0)
+                            in_data[next_in_name] = prev_out[idx]
+            elif ii == 0:  # first timestep
+                for model_input in params['model_inputs']:
+                    if X[model_input].shape[0] == 1:
+                        in_data[model_input] = np.repeat(X[model_input], n_samples, axis=0)
                     else:
-                        out_data = np.vstack((out_data, predicted_out))
+                        in_data[model_input] = X[model_input]
+                    if params.get('pad_on_batch', True):
+                        states_below = states_below.reshape(n_samples, -1)
+                in_data[params['model_inputs'][params['state_below_index']]] = states_below
 
-        ##########################################
-        # Get outputs
-        ##########################################
-        if len(output_ids_list) > 1:
-            all_data = {}
-            for output_id in range(len(output_ids_list)):
-                all_data[output_ids_list[output_id]] = cp.asarray(out_data[output_id])
-            all_data[output_ids_list[0]] = cp.asarray(all_data[output_ids_list[0]][:, pick_idx, :])
-        else:
-            all_data = {output_ids_list[0]: cp.asarray(out_data[:, pick_idx, :])}
-        probs = cp.asarray(all_data[output_ids_list[0]])
+            elif ii == 1:  # timestep == 1 (model_init to model_next)
+                for idx, init_out_name in list(enumerate(self.ids_outputs_init_2)):
+                    if idx == 0:
+                        if params.get('attend_on_output', False):
+                            if params.get('pad_on_batch', True):
+                                pass
+                        else:
+                            if params.get('pad_on_batch', True):
+                                states_below = states_below[:, -1].reshape(n_samples, -1)
+                        in_data[self.ids_inputs_next_2[0]] = states_below
 
-        ##########################################
-        # Define returned data
-        ##########################################
-        return [probs, out_data]
+                    if idx > 0:  # first output must be the output probs.
+                        if init_out_name in list(self.matchings_init_to_next_2):
+                            next_in_name = self.matchings_init_to_next_2[init_out_name]
+                            if prev_out[idx].shape[0] == 1:
+                                prev_out[idx] = np.repeat(prev_out[idx], n_samples, axis=0)
+                            in_data[next_in_name] = prev_out[idx]
+
+            ##########################################
+            # Recover output identifiers
+            ##########################################
+            # in any case, the first output of the models must be the next words' probabilities
+            pick_idx = ii if params.get('attend_on_output', False) else 0
+            if ii == 0:  # optimized search model (model_init case)
+                output_ids_list = self.ids_outputs_init_2
+            else:  # optimized search model (model_next case)
+                output_ids_list = self.ids_outputs_next_2
+
+            ##########################################
+            # Apply prediction on current timestep
+            ##########################################
+            #print(in_data)
+            if params['max_batch_size'] >= n_samples:  # The model inputs beam will fit into one batch in memory
+                out_data = model.predict_on_batch(in_data)
+            else:
+                # It is possible that the model inputs don't fit into one single batch:
+                #  Make beam_batch_size-sample-sized batches
+                for i in range(0, n_samples, params['beam_batch_size']):
+                    aux_in_data = {}
+                    for k, v in iteritems(in_data):
+                        max_pos = min([i + params['beam_batch_size'], n_samples, len(v)])
+                        aux_in_data[k] = v[i:max_pos]
+                        # aux_in_data[k] = np.expand_dims(v[i], axis=0)
+                    predicted_out = model.predict_on_batch(aux_in_data)
+                    if i == 0:
+                        out_data = predicted_out
+                    else:
+                        if len(output_ids_list) > 1:
+                            for iout in range(len(output_ids_list)):
+                                out_data[iout] = np.vstack((out_data[iout], predicted_out[iout]))
+                        else:
+                            out_data = np.vstack((out_data, predicted_out))
+
+            ##########################################
+            # Get outputs
+            ##########################################
+            if len(output_ids_list) > 1:
+                all_data = {}
+                for output_id in range(len(output_ids_list)):
+                    all_data[output_ids_list[output_id]] = cp.asarray(out_data[output_id])
+                all_data[output_ids_list[0]] = cp.asarray(all_data[output_ids_list[0]][:, pick_idx, :])
+            else:
+                all_data = {output_ids_list[0]: cp.asarray(out_data[:, pick_idx, :])}
+            probs = cp.asarray(all_data[output_ids_list[0]])
+
+            ##########################################
+            # Define returned data
+            ##########################################
+            return [probs, out_data]
 
     def beam_search(self, X, params, return_alphas=False, eos_sym=0, null_sym=2):
         """
@@ -2198,7 +2362,6 @@ class Model_Wrapper(object):
         else:
             state_below = np.asarray([null_sym]) \
                 if pad_on_batch else np.asarray([np.zeros(params['maxlen'])])
-
         prev_out = None
         for ii in range(len(Y)):
             # for every possible live sample calc prob for every possible label
@@ -2451,7 +2614,7 @@ class Model_Wrapper(object):
         logger.warning("Deprecated function, use utils.decode_predictions_one_hot() instead.")
         return decode_predictions_one_hot(preds, index2word, verbose=verbose)
 
-    def prepareData(self, X_batch, Y_batch=None,dataset_number=0):
+    def prepareData(self, X_batch, Y_batch=None):
         """
         Prepares the data for the model, depending on its type (Sequential, Model, Graph).
         :param X_batch: Batch of input data.
@@ -2461,7 +2624,7 @@ class Model_Wrapper(object):
         if isinstance(self.model, Sequential):
             data = self._prepareSequentialData(X_batch, Y_batch)
         elif isinstance(self.model, Model):
-            data = self._prepareModelData(X_batch, Y_batch,dataset_number)
+            data = self._prepareModelData(X_batch, Y_batch)
         else:
             raise NotImplementedError
         return data
@@ -2499,59 +2662,23 @@ class Model_Wrapper(object):
 
         return [X, Y] if Y_sample_weights is None else [X, Y, Y_sample_weights]
 
-    def _prepareModelData(self, X, Y=None,dataset_number=0):
+    def _prepareModelData(self, X, Y=None):
         X_new = dict()
         Y_new = dict()
         Y_sample_weights = dict()
         # Format input data
-        print("Input mapping: ",self.inputsMapping)
-        if len(self.inputsMapping) < 2:
-            for in_model, in_ds in iteritems(self.inputsMapping):
-                X_new[in_model] = X[in_ds]
-        else:
-            for in_model, in_ds in iteritems(self.inputsMapping[dataset_number]):
-                X_new[in_model] = X[in_ds]
-                try:
-                    print(int(in_model[-1]))
-                    if int(in_model[-1]) == 0:
-                        X_new['state_below_1'] = np.zeros_like(X_new[in_model])
-                        print(X_new)
-                    elif int(in_model[-1]) == 1:
-                        X_new['state_below_0'] = np.zeros_like(X_new[in_model])
-                        print(X_new)
-                    else:
-                        print("pase")
-                except:
-                    pass       
+        for in_model, in_ds in iteritems(self.inputsMapping):
+            X_new[in_model] = X[in_ds]
+
         # Format output data
-        print("Output mapping:",self.outputsMapping)
-        if len(self.outputsMapping) < 2:
-            if Y is not None:
-                for out_model, out_ds in iteritems(self.outputsMapping):
-                    if isinstance(Y[out_ds], tuple):
-                        Y_new[out_model] = Y[out_ds][0]
-                        Y_sample_weights[out_model] = Y[out_ds][1]
-                    else:
-                        Y_new[out_model] = Y[out_ds]
-        else:
-            if Y is not None:
-                for out_model, out_ds in iteritems(self.outputsMapping[dataset_number]):
-                    print("out_model: ",out_model,"out_ds: ",out_ds)
-                    try:
-                        if isinstance(Y[out_ds], tuple):
-                            Y_new[out_model] = Y[out_ds][0]
-                            Y_sample_weights[out_model] = Y[out_ds][1]
-                            if "target_text_es" in out_model:
-                                Y_new["target_text_fr"] = np.zeros_like(Y_new[out_model])
-                                print("entro222")
-                            else:
-                                Y_new["target_text_es"] = np.zeros_like(Y_new[out_model])
-                        else:
-                            Y_new[out_model] = Y[out_ds]
-                        print(Y_new)
-                    except:
-                        print("paso")
-                        pass
+        if Y is not None:
+            for out_model, out_ds in iteritems(self.outputsMapping):
+                if isinstance(Y[out_ds], tuple):
+                    Y_new[out_model] = Y[out_ds][0]
+                    Y_sample_weights[out_model] = Y[out_ds][1]
+                else:
+                    Y_new[out_model] = Y[out_ds]
+
         return [X_new, Y_new] if Y_sample_weights == dict() else [X_new, Y_new, Y_sample_weights]
     
     def _prepareModelDataMultiDataset(self, X, Y=None,dataset_number=0):

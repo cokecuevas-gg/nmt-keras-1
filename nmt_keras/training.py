@@ -70,10 +70,14 @@ def train_model(params, load_dataset=None):
                 datasets = build_dataset_multilanguage(params)
         else:
             dataset = loadDataset(load_dataset)
+    #
+    #
     #MODIFICAR EL TAMAÑO DEL VOCABULARIO
+    #
+    #
     if params['MULTILANGUAGE'] > 0:
-        params['INPUT_VOCABULARY_SIZE'] = datasets[0].vocabulary_len[params['INPUTS_IDS_DATASET'][0]]
-        params['OUTPUT_VOCABULARY_SIZE'] = datasets[0].vocabulary_len[params['OUTPUTS_IDS_DATASET'][0]]
+        params['INPUT_VOCABULARY_SIZE'] = datasets[1].vocabulary_len[params['INPUTS_IDS_DATASET'][0]]
+        params['OUTPUT_VOCABULARY_SIZE'] = datasets[1].vocabulary_len[params['OUTPUTS_IDS_DATASET'][0]]
     else:
         params['INPUT_VOCABULARY_SIZE'] = dataset.vocabulary_len[params['INPUTS_IDS_DATASET'][0]]
         params['OUTPUT_VOCABULARY_SIZE'] = dataset.vocabulary_len[params['OUTPUTS_IDS_DATASET'][0]]
@@ -87,7 +91,7 @@ def train_model(params, load_dataset=None):
     
     if params['MULTILANGUAGE'] > 0:
         nmt_model = TranslationModel(params,
-                                    model_type="AttentionRNNEncoderNonSharedDecoder",
+                                    model_type="ParalelDecoder",
                                     verbose=params['VERBOSE'],
                                     model_name=params['MODEL_NAME'],
                                     vocabularies=datasets[0].vocabulary, #modify the vocabulary!!!
@@ -104,52 +108,22 @@ def train_model(params, load_dataset=None):
                                     set_optimizer=set_optimizer,
                                     clear_dirs=clear_dirs)
     # Define the inputs and outputs mapping from our Dataset instance to our model
-    if params['MULTILANGUAGE'] > 0:
-        ##########DANGEROUS!!!!!!!!!!!!!!!!!! CAMBIAR EL IDS INPUTS!!!
-        input_mappings = []
-        output_mappings = []
-        for j,dataset in enumerate(datasets):
-            inputMapping = dict()
-            for i, id_in in enumerate(params['INPUTS_IDS_DATASET']):
-                if "source" not in id_in:
-                    pos_source = dataset.ids_inputs.index(id_in+"_"+str(j))
-                    id_dest = nmt_model.ids_inputs[i]
-                    inputMapping[id_dest+"_"+str(j)] = pos_source
-                else:
-                    pos_source = dataset.ids_inputs.index(id_in)
-                    id_dest = nmt_model.ids_inputs[i]
-                    inputMapping[id_dest] = pos_source
-            input_mappings.append(inputMapping)
-            print(dataset.ids_outputs)
-            outputMapping = dict()
-            outputMapping[params['OUTPUTS_IDS_DATASET'][0]] = 0
-            outputMapping[params['OUTPUTS_IDS_DATASET'][1]] = 1
-            output_mappings.append(outputMapping)
-            #print(jsonpickle.encode(dataset))
-            print(dataset)
-            #print("____________________________________________")
-        nmt_model.setInputsMapping(input_mappings)
-        nmt_model.setOutputsMapping(output_mappings)
-    else:
-        inputMapping = dict()
-        print(dataset.ids_inputs)
-        for i, id_in in enumerate(params['INPUTS_IDS_DATASET']):
-            pos_source = dataset.ids_inputs.index(id_in)
-            id_dest = nmt_model.ids_inputs[i]
-            inputMapping[id_dest] = pos_source
-        nmt_model.setInputsMapping(inputMapping)
-        print(inputMapping)
-        outputMapping = dict()
-        for i, id_out in enumerate(params['OUTPUTS_IDS_DATASET']):
-            pos_target = dataset.ids_outputs.index(id_out)
-            id_dest = nmt_model.ids_outputs[i]
-            outputMapping[id_dest] = pos_target
-        nmt_model.setOutputsMapping(outputMapping)
-        print(outputMapping)
-        #print(jsonpickle.encode(dataset))
-        print(dataset)
-        print("____________________________________________")
-
+    inputMapping = dict()
+    print(datasets[0].ids_inputs)
+    for i, id_in in enumerate(params['INPUTS_IDS_DATASET']):
+        pos_source = datasets[0].ids_inputs.index(id_in)
+        id_dest = nmt_model.ids_inputs[i]
+        inputMapping[id_dest] = pos_source
+    nmt_model.setInputsMapping(inputMapping)
+    outputMapping = dict()
+    for i, id_out in enumerate(params['OUTPUTS_IDS_DATASET']):
+        pos_target = datasets[0].ids_outputs.index(id_out)
+        id_dest = nmt_model.ids_outputs[i]
+        outputMapping[id_dest] = pos_target
+    nmt_model.setOutputsMapping(outputMapping)
+    #print(jsonpickle.encode(dataset))
+    print("____________________________________________")
+    print(datasets[0])
     if params['RELOAD'] > 0:
         nmt_model = updateModel(nmt_model, params['STORE_PATH'], params['RELOAD'], reload_epoch=params['RELOAD_EPOCH'])
         nmt_model.setParams(params)
@@ -259,8 +233,7 @@ def train_model(params, load_dataset=None):
                                                 'word_embeddings_labels': params.get('WORD_EMBEDDINGS_LABELS', None),
                                                 }
                         }
-            multi_training_params.append(training_params)
-    # Training
+            multi_training_params.append(training_params)    # Training
     total_start_time = timer()
 
     logger.debug('Starting training!')
@@ -268,7 +241,6 @@ def train_model(params, load_dataset=None):
     if params['MULTILANGUAGE'] != 1:
         nmt_model.trainNet(dataset, training_params)
     else:
-        print("MULTILANGUAGE")
         nmt_model.trainNet(datasets, multi_training_params)
 
     total_end_time = timer()

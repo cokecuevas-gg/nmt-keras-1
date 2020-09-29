@@ -143,7 +143,7 @@ def buildCallbacksMultiDataSet(params, model, datasets):
 
             input_text_id = params['INPUTS_IDS_DATASET'][0]
             vocab_x = dataset.vocabulary[input_text_id]['idx2words']
-            vocab_y = dataset.vocabulary[params['OUTPUTS_IDS_DATASET'][j]]['idx2words']
+            vocab_y = dataset.vocabulary[params['OUTPUTS_IDS_DATASET'][0]]['idx2words']
             if params['BEAM_SEARCH']:
                 extra_vars['beam_size'] = params.get('BEAM_SIZE', 6)
                 extra_vars['state_below_index'] = params.get('BEAM_SEARCH_COND_INPUT', -1)
@@ -152,8 +152,8 @@ def buildCallbacksMultiDataSet(params, model, datasets):
                 extra_vars['model_inputs'] = params['INPUTS_IDS_MODEL']
                 extra_vars['model_outputs'] = params['OUTPUTS_IDS_MODEL']
                 extra_vars['dataset_inputs'] = params['INPUTS_IDS_DATASET']
-                #extra_vars['dataset_outputs'] = params['OUTPUTS_IDS_DATASET']
-                extra_vars['dataset_outputs'] = ["target_text_"+target_lan[j]]
+                extra_vars['dataset_outputs'] = params['OUTPUTS_IDS_DATASET']
+                #extra_vars['dataset_outputs'] = ["target_text"]
                 extra_vars['search_pruning'] = params.get('SEARCH_PRUNING', False)
                 extra_vars['normalize_probs'] = params.get('NORMALIZE_SAMPLING', False)
                 extra_vars['alpha_factor'] = params.get('ALPHA_FACTOR', 1.)
@@ -179,10 +179,10 @@ def buildCallbacksMultiDataSet(params, model, datasets):
             if params['METRICS']:
                 for s in params['EVAL_ON_SETS']:
                     extra_vars[s] = dict()
-                    extra_vars[s]['references'] = dataset.extra_variables[s][params['OUTPUTS_IDS_DATASET'][j]]
+                    extra_vars[s]['references'] = dataset.extra_variables[s][params['OUTPUTS_IDS_DATASET'][0]]
                 callback_metric = EvalPerformance(model,
                                                 dataset,
-                                                gt_id=params['OUTPUTS_IDS_DATASET'][j],
+                                                gt_id=params['OUTPUTS_IDS_DATASET'][0],
                                                 metric_name=params['METRICS'],
                                                 set_name=params['EVAL_ON_SETS'],
                                                 batch_size=params['BATCH_SIZE'],
@@ -209,7 +209,7 @@ def buildCallbacksMultiDataSet(params, model, datasets):
             if params['SAMPLE_ON_SETS']:
                 callback_sampling = SampleEachNUpdates(model,
                                                     dataset,
-                                                    gt_id=params['OUTPUTS_IDS_DATASET'][j],
+                                                    gt_id=params['OUTPUTS_IDS_DATASET'][0],
                                                     set_name=params['SAMPLE_ON_SETS'],
                                                     n_samples=params['N_SAMPLES'],
                                                     each_n_updates=params['SAMPLE_EACH_UPDATES'],

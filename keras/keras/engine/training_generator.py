@@ -195,8 +195,10 @@ def fit_generator(model,
                                      'a tuple `(x, y, sample_weight)` '
                                      'or `(x, y)`. Found: ' +
                                      str(generator_output))
-                print("X",x)
-                print("Y",y)
+                #print("________________________")
+                #print("X",x)
+                #print("Y",y)
+                #print("________________________")
                 if x is None or len(x) == 0:
                     # Handle data tensors support when no input given
                     # step-size = 1 for data tensors

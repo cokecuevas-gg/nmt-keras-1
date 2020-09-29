@@ -74,6 +74,7 @@ def sample_ensemble(args, params):
     params_prediction['output_min_length_depending_on_x_factor'] = params.get('MINLEN_GIVEN_X_FACTOR', 2)
     params_prediction['attend_on_output'] = params.get('ATTEND_ON_OUTPUT', 'transformer' in params['MODEL_TYPE'].lower())
     params_prediction['glossary'] = params.get('GLOSSARY', None)
+    params_prediction['dataset_number'] = params.get('DATASET_NUMBER')
 
     heuristic = params.get('HEURISTIC', 0)
     mapping = None if dataset.mapping == dict() else dataset.mapping

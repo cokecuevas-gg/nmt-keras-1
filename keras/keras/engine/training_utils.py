@@ -67,7 +67,9 @@ def standardize_input_data(data,
         return []
     if data is None:
         return [None for _ in range(len(names))]
-
+    #print(names)
+    #print(data)
+    #print("-------------")
     if isinstance(data, dict):
         try:
             data = [
