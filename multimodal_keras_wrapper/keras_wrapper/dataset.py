@@ -507,7 +507,6 @@ class Data_Batch_Generator(object):
                                                           da_patch_type=self.params['da_patch_type'],
                                                           da_enhance_list=self.params['da_enhance_list'])
                     data = self.net.prepareData(X_batch, Y_batch)
-
             yield (data)
 
 class Homogeneous_Data_Batch_Generator(object):

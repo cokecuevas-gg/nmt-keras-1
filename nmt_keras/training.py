@@ -73,11 +73,11 @@ def train_model(params, load_dataset=None):
     #
     #
     #MODIFICAR EL TAMAÑO DEL VOCABULARIO
-    #
+    # ENCONTRAR UN PUNTO MEDIO
     #
     if params['MULTILANGUAGE'] > 0:
-        params['INPUT_VOCABULARY_SIZE'] = datasets[1].vocabulary_len[params['INPUTS_IDS_DATASET'][0]]
-        params['OUTPUT_VOCABULARY_SIZE'] = datasets[1].vocabulary_len[params['OUTPUTS_IDS_DATASET'][0]]
+        params['INPUT_VOCABULARY_SIZE'] = datasets[0].vocabulary_len[params['INPUTS_IDS_DATASET'][0]]
+        params['OUTPUT_VOCABULARY_SIZE'] = datasets[0].vocabulary_len[params['OUTPUTS_IDS_DATASET'][0]]
     else:
         params['INPUT_VOCABULARY_SIZE'] = dataset.vocabulary_len[params['INPUTS_IDS_DATASET'][0]]
         params['OUTPUT_VOCABULARY_SIZE'] = dataset.vocabulary_len[params['OUTPUTS_IDS_DATASET'][0]]
@@ -115,15 +115,19 @@ def train_model(params, load_dataset=None):
         id_dest = nmt_model.ids_inputs[i]
         inputMapping[id_dest] = pos_source
     nmt_model.setInputsMapping(inputMapping)
+    print("Inputs: ",inputMapping)
     outputMapping = dict()
     for i, id_out in enumerate(params['OUTPUTS_IDS_DATASET']):
         pos_target = datasets[0].ids_outputs.index(id_out)
         id_dest = nmt_model.ids_outputs[i]
         outputMapping[id_dest] = pos_target
     nmt_model.setOutputsMapping(outputMapping)
+    print("Outputs: ",outputMapping)
     #print(jsonpickle.encode(dataset))
     print("____________________________________________")
     print(datasets[0])
+    print("____________________________________________")
+    print(datasets[1])
     if params['RELOAD'] > 0:
         nmt_model = updateModel(nmt_model, params['STORE_PATH'], params['RELOAD'], reload_epoch=params['RELOAD_EPOCH'])
         nmt_model.setParams(params)

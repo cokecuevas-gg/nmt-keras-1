@@ -485,7 +485,7 @@ class EvalPerformance(KerasCallback):
                 # Store predictions
                 if self.write_samples:
                     # Store result
-                    filepath = self.save_path + '/' + s + '_' + counter_name + '_' + str(epoch) + '_output_' + str(gt_pos) + '.pred'  # results file
+                    filepath = self.save_path + '/' + s + '_' + counter_name + '_' + str(epoch) + '_output_' + str(gt_pos) +'_'+str(self.model_to_eval.model_language) + '.pred'  # results file
                     if write_type == 'list':
                         list2file(filepath, predictions)
                     elif write_type == 'vqa':
@@ -635,7 +635,10 @@ class StoreModel(KerasCallback):
         epoch += 1
         if epoch % self.epochs_for_save == 0:
             print('')
-            self.store_function(self.model_to_save, epoch)
+            if self.model_to_save.epoch_counter >= 0:
+                self.store_function(self.model_to_save, self.model_to_save.epoch_counter)
+            else:
+                self.store_function(self.model_to_save, epoch)
 
 
 StoreModelWeightsOnEpochEnd = StoreModel

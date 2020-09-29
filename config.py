@@ -18,7 +18,7 @@ def load_parameters():
     SRCS_LAN = ['en']
     TRGS_LAN = ['es','fr']                                 # Language of the target text.
     #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuroTrans_full' #% (TA, DATASET_NAME)  # Path where data is stored.
-    DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/nmt-keras/examples/EuTrans'
+    DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/nmt-keras/examples/EuTrans/real'
     #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuTrans'
     MULTILANGUAGE = 1
     # SRC_LAN or TRG_LAN will be added to the file names.
@@ -163,7 +163,7 @@ def load_parameters():
     MIN_LR = 1e-9                                 # Minimum value allowed for the decayed LR
 
     # Training parameters
-    MAX_EPOCH = 5                               # Stop when computed this number of epochs.
+    MAX_EPOCH = 1                              # Stop when computed this number of epochs.
     BATCH_SIZE =  128                            # Size of each minibatch.
     N_GPUS = 1                                    # Number of GPUs to use. Only for Tensorflow backend. Each GPU will receive mini-batches of BATCH_SIZE / N_GPUS.
 
@@ -176,7 +176,7 @@ def load_parameters():
 
     # Early stop parameters
     EARLY_STOP = True                             # Turns on/off the early stop protocol.
-    PATIENCE = 20                                 # We'll stop if the val STOP_METRIC does not improve after this.
+    PATIENCE = 3                                 # We'll stop if the val STOP_METRIC does not improve after this.
                                                   # number of evaluations.
     STOP_METRIC = 'Bleu_4'                        # Metric for the stop.
     MIN_DELTA = 0.                                # Minimum change in the monitored quantity to consider it as an improvement.
