@@ -1512,12 +1512,12 @@ class TranslationModel(Model_Wrapper):
             if 'LSTM' in params['DECODER_RNN_TYPE']:
                 input_rnn_decoder_layer_2.append(prev_h_memories_list_2[n_deep_decoder_layer_idx_2])
 
-            current_rnn_output_2 = rnn_decoder_layer_2(input_rnn_decoder_layer_2)
+            current_rnn_output_2 = rnn_decoder_layer(input_rnn_decoder_layer_2)
             current_proj_h_2 = current_rnn_output_2[0]
             h_states_list_2.append(current_rnn_output_2[1])  # h_state
             if 'LSTM' in params['DECODER_RNN_TYPE']:
                 h_memories_list_2.append(current_rnn_output_2[2])  # h_memory
-            for reg in proj_h_reg_2:
+            for reg in proj_h_reg:
                 current_proj_h_2 = reg(current_proj_h_2)
             proj_h_2 = Add()([proj_h_2, current_proj_h_2])
         out_layer_mlp_2 = shared_FC_mlp_2(proj_h_2)
