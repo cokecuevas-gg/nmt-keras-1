@@ -1725,7 +1725,7 @@ class Model_Wrapper(object):
         # Get inputs
         ##########################################
         if self.model_language == 0 or params.get('dataset_number') == 0:
-            print("USANDO MODEL INIT 0")
+            #print("USANDO MODEL INIT 0")
             if ii > 1:  # timestep > 1 (model_next to model_next)
                 for idx, next_out_name in list(enumerate(self.ids_outputs_next)):
                     if idx == 0:
@@ -1822,7 +1822,7 @@ class Model_Wrapper(object):
             ##########################################
             return [probs, out_data]
         else: 
-            print("USANDO MODEL INIT 2")
+            #print("USANDO MODEL INIT 2")
             if ii > 1:  # timestep > 1 (model_next to model_next)
                 for idx, next_out_name in list(enumerate(self.ids_outputs_next_2)):
                     if idx == 0:
