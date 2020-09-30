@@ -396,6 +396,7 @@ class TranslationModel(Model_Wrapper):
 
         if hasattr(self, 'multi_gpu_model') and self.multi_gpu_model is not None:
             model_to_compile = self.multi_gpu_model
+            mode_to_compile2 = self.multi_gpu_model_2
         else:
             model_to_compile = self.model
             model_to_compile2 = self.model2
@@ -1384,7 +1385,7 @@ class TranslationModel(Model_Wrapper):
 
         if params.get('N_GPUS', 1) > 1:
             self.multi_gpu_model = multi_gpu_model(self.model, gpus=params['N_GPUS'])
-            self.multi_gpu_model = multi_gpu_model(self.model2, gpus=params['N_GPUS'])
+            self.multi_gpu_model_2 = multi_gpu_model(self.model2, gpus=params['N_GPUS'])
         else:
             self.multi_gpu_model = None
 
