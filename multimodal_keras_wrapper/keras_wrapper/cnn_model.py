@@ -1366,11 +1366,11 @@ class Model_Wrapper(object):
             # Keras 2.x version
             for i in range(0,int(params['n_epochs'])): #while not convergence??
                 # Store model
-                self.epoch_counter = i
+                self.epoch_counter = i+1
                 print("EPOCH: ",self.epoch_counter)
                 if params['epochs_for_save'] >= 0:
                     callback_store_model = StoreModelWeightsOnEpochEnd(self, saveModel, params['epochs_for_save'])
-                    if self.epoch_counter == 0:
+                    if self.epoch_counter == 1:
                         multi_callbacks[0].insert(0, callback_store_model)
                         multi_callbacks[1].insert(0, callback_store_model)
                     else:
@@ -1382,7 +1382,8 @@ class Model_Wrapper(object):
                 x, y, sample_weight = generator_output
                 model_to_train.fit(x,y,steps_per_epoch=state['n_iterations_per_epoch'],
                                             sample_weight=sample_weight,
-                                            epochs=1,
+                                            epochs=self.epoch_counter,
+                                            initial_epoch = self.epoch_counter - 1,
                                             verbose=params['verbose'],
                                             callbacks=multi_callbacks[0],
                                             validation_data=val_gen,
@@ -1396,7 +1397,8 @@ class Model_Wrapper(object):
                 x2, y2, sample_weight2 = generator_output2
                 model_to_train2.fit(x2,y2,steps_per_epoch=state['n_iterations_per_epoch'],
                                             sample_weight=sample_weight2,
-                                            epochs=1,
+                                            epochs=self.epoch_counter,
+                                            initial_epoch = self.epoch_counter - 1,
                                             verbose=params['verbose'],
                                             callbacks=multi_callbacks[1],
                                             validation_data=val_gen,
