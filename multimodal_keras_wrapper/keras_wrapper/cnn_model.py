@@ -67,7 +67,6 @@ def saveModel(model_wrapper, update_num, path=None, full_path=False, store_iter=
         path = model_wrapper.model_path
     iteration = str(update_num)
     model_number = str(model_wrapper.model_language)
-    print("guardando algo",model_number)
     if full_path:
         if store_iter:
             model_name = path + '_' + iteration + '_' + model_number
@@ -1393,8 +1392,6 @@ class Model_Wrapper(object):
                                             workers=1)
                 '''for layer in model_to_train.layers:
                     print(layer.get_config(), layer.get_weights())'''
-
-
                 
                 print("ENTRENANDO EL FRANCÉS")
                 self.model_language = 1
