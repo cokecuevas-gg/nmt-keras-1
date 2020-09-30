@@ -396,7 +396,7 @@ class TranslationModel(Model_Wrapper):
 
         if hasattr(self, 'multi_gpu_model') and self.multi_gpu_model is not None:
             model_to_compile = self.multi_gpu_model
-            mode_to_compile2 = self.multi_gpu_model_2
+            model_to_compile2 = self.multi_gpu_model_2
         else:
             model_to_compile = self.model
             model_to_compile2 = self.model2
