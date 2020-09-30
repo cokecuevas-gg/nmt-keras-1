@@ -1710,16 +1710,16 @@ class Model_Wrapper(object):
         if ii == 0:
             if self.model_language == 0 or params.get('dataset_number') == 0:
                 model = self.model_init
-                print("USANDO MODEL INIT 0")
+                #print("USANDO MODEL INIT 0")
             else:
-                print("USANDO MODEL INIT 2")
+                #print("USANDO MODEL INIT 2")
                 model = self.model_init2
         else:
             if self.model_language == 0 or params.get('dataset_number') == 0:
-                print("USANDO MODEL INIT 0")
+                #print("USANDO MODEL INIT 0")
                 model = self.model_next
             else:
-                print("USANDO MODEL INIT 2")
+                #print("USANDO MODEL INIT 2")
                 model = self.model_next2
         ##########################################
         # Get inputs
