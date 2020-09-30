@@ -156,6 +156,7 @@ class TranslationModel(Model_Wrapper):
         if verbose > 0:
             print(str(self))
             self.model.summary()
+            self.model2.summary()
             sys.stdout.flush()
 
         if set_optimizer:
@@ -1023,7 +1024,7 @@ class TranslationModel(Model_Wrapper):
                                     trainable=self.trg_embedding_weights_trainable,
                                     weights=self.trg_embedding_weights,
                                     mask_zero=True)(next_words)
-            state_below_2 = Embedding(params['OUTPUT_VOCABULARY_SIZE'], params['TARGET_TEXT_EMBEDDING_SIZE'],
+            state_below_2 = Embedding(params['OUTPUT_VOCABULARY_SIZE_2'], params['TARGET_TEXT_EMBEDDING_SIZE'],
                                     name='target_word_embedding',
                                     embeddings_regularizer=l2(params['WEIGHT_DECAY']),
                                     embeddings_initializer=params['INIT_FUNCTION'],
@@ -1361,7 +1362,7 @@ class TranslationModel(Model_Wrapper):
                                                ),
                                          trainable=(params.get('TRAINABLE_DECODER', True) or params.get('TRAIN_ONLY_LAST_LAYER', True)),
                                          name=self.ids_outputs[0])
-        shared_FC_soft_2 = TimeDistributed(Dense(params['OUTPUT_VOCABULARY_SIZE'],
+        shared_FC_soft_2 = TimeDistributed(Dense(params['OUTPUT_VOCABULARY_SIZE_2'],
                                                activation=params['CLASSIFIER_ACTIVATION'],
                                                kernel_regularizer=l2(params['WEIGHT_DECAY']),
                                                bias_regularizer=l2(params['WEIGHT_DECAY']),

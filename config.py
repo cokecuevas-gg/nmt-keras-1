@@ -17,10 +17,10 @@ def load_parameters():
     TRG_LAN = 'es'
     SRCS_LAN = ['en']
     TRGS_LAN = ['es','fr']                                 # Language of the target text.
-    #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuroTrans_full' #% (TA, DATASET_NAME)  # Path where data is stored.
-    DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/nmt-keras/examples/EuTrans/real'
-    #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuTrans'
     MULTILANGUAGE = 1
+    #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuroTrans_full' #% (TA, DATASET_NAME)  # Path where data is stored.
+    #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/nmt-keras/examples/EuTrans/real'
+    DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuTrans'
     # SRC_LAN or TRG_LAN will be added to the file names.
     TEXT_FILES = {'train': 'training.',             # Data files.
                   'val': 'dev.',
@@ -119,8 +119,7 @@ def load_parameters():
     MAX_INPUT_TEXT_LEN = 50                       # Maximum length of the input sequence.
 
     # Output text parameters
-    OUTPUT_VOCABULARY_SIZE = 0                    # Size of the input vocabulary. Set to 0 for using all,
-    OUTPUT_VOCABULARY_SIZE_2 = 0                                              # otherwise it will be truncated to these most frequent words.
+    OUTPUT_VOCABULARY_SIZE = 0                   # Size of the input vocabulary. Set to 0 for using all,                                              # otherwise it will be truncated to these most frequent words.
     MIN_OCCURRENCES_OUTPUT_VOCAB = 0              # Minimum number of occurrences allowed for the words in the output vocabulary.
     MAX_OUTPUT_TEXT_LEN = 50                      # Maximum length of the output sequence.
                                                   # set to 0 if we want to use the whole answer as a single class.
