@@ -1346,6 +1346,7 @@ class Model_Wrapper(object):
         # Train model
         if params.get('n_gpus', 1) > 1 and hasattr(self, 'multi_gpu_model') and self.multi_gpu_model is not None:
             model_to_train = self.multi_gpu_model
+            model_to_train2 = self.multi_gpu_model_2
         else:
             model_to_train = self.model
             model_to_train2 = self.model2
