@@ -1364,7 +1364,6 @@ class Model_Wrapper(object):
                                          initial_epoch=params['epoch_offset'])
         else:
             # Keras 2.x version
-            self.epoch_counter = 0
             for i in range(0,int(params['n_epochs'])): #while not convergence??
                 # Store model
                 self.epoch_counter = i
@@ -1390,8 +1389,7 @@ class Model_Wrapper(object):
                                             validation_steps=n_valid_samples,
                                             class_weight=class_weight,
                                             max_queue_size=params['n_parallel_loaders'],
-                                            workers=1,
-                                            initial_epoch=params['epoch_offset'])
+                                            workers=1)
                 print("ENTRENANDO EL FRANCÉS")
                 self.model_language = 1
                 generator_output2 = next(trains_gen[1])
@@ -1405,8 +1403,7 @@ class Model_Wrapper(object):
                                             validation_steps=n_valid_samples,
                                             class_weight=class_weight,
                                             max_queue_size=params['n_parallel_loaders'],
-                                            workers=1,
-                                            initial_epoch=params['epoch_offset'])
+                                            workers=1)
             '''print("Se entrenará el primer lenguaje")
             self.model_language = 0
             model_to_train.fit_generator(trains_gen[0],
