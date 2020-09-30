@@ -1218,10 +1218,6 @@ class Model_Wrapper(object):
             if params['verbose'] > 0:
                 logger.info(print_dict(params, header="Training parameters: "))
 
-        # initialize state
-        state['samples_per_epoch'] = ds[0].len_train + ds[1].len_train
-        state['n_iterations_per_epoch'] = int(math.ceil(float(state['samples_per_epoch']) / params['batch_size']))
-
         # Prepare callbacks
         multi_callbacks = []
         for n,params in enumerate(multi_params):
@@ -1295,6 +1291,9 @@ class Model_Wrapper(object):
         # Prepare data generators
         trains_gen = []
         for dataset in ds:
+            # initialize state
+            state['samples_per_epoch'] = dataset.len_train
+            state['n_iterations_per_epoch'] = int(math.ceil(float(state['samples_per_epoch']) / params['batch_size']))
             train_gen = Data_Batch_Generator('train',
                                                     self,
                                                     dataset,
@@ -1369,6 +1368,7 @@ class Model_Wrapper(object):
             for i in range(0,int(params['n_epochs'])): #while not convergence??
                 # Store model
                 self.epoch_counter = i
+                print("EPOCH: ",self.epoch_counter)
                 if params['epochs_for_save'] >= 0:
                     callback_store_model = StoreModelWeightsOnEpochEnd(self, saveModel, params['epochs_for_save'])
                     if self.epoch_counter == 0:
@@ -1377,15 +1377,10 @@ class Model_Wrapper(object):
                     else:
                         multi_callbacks[0][0]=callback_store_model
                         multi_callbacks[1][0]=callback_store_model
+                print("ENTRENANDO EL ESPAÑOL")
                 self.model_language = 0
-                print("extrayendo datos para el español")
                 generator_output = next(trains_gen[0])
                 x, y, sample_weight = generator_output
-                print("ENTRENANDO EL ESPAÑOL")
-                import numpy
-                print(numpy.shape(x))
-                print(numpy.shape(y))
-                
                 model_to_train.fit(x,y,steps_per_epoch=state['n_iterations_per_epoch'],
                                             sample_weight=sample_weight,
                                             epochs=1,
@@ -1397,10 +1392,9 @@ class Model_Wrapper(object):
                                             max_queue_size=params['n_parallel_loaders'],
                                             workers=1,
                                             initial_epoch=params['epoch_offset'])
-                print("extrayendo datos para el francés")
+                print("ENTRENANDO EL FRANCÉS")
                 self.model_language = 1
                 generator_output2 = next(trains_gen[1])
-                print("ENTRENANDO EL FRANCÉS")
                 x2, y2, sample_weight2 = generator_output2
                 model_to_train2.fit(x2,y2,steps_per_epoch=state['n_iterations_per_epoch'],
                                             sample_weight=sample_weight2,
