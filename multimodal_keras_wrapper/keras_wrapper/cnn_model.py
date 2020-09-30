@@ -1639,6 +1639,7 @@ class Model_Wrapper(object):
         ##########################################
         # Choose model to use for sampling
         ##########################################
+        print(dangerous)
         model = self.model
         for model_input in params['model_inputs']:
             if X[model_input].shape[0] == 1:
