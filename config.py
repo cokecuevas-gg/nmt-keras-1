@@ -162,7 +162,7 @@ def load_parameters():
     MIN_LR = 1e-9                                 # Minimum value allowed for the decayed LR
 
     # Training parameters
-    MAX_EPOCH = 1                              # Stop when computed this number of epochs.
+    MAX_EPOCH = 1                             # Stop when computed this number of epochs.
     BATCH_SIZE =  128                            # Size of each minibatch.
     N_GPUS = 1                                    # Number of GPUs to use. Only for Tensorflow backend. Each GPU will receive mini-batches of BATCH_SIZE / N_GPUS.
 

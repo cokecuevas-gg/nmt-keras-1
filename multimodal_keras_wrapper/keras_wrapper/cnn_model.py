@@ -1391,7 +1391,12 @@ class Model_Wrapper(object):
                                             class_weight=class_weight,
                                             max_queue_size=params['n_parallel_loaders'],
                                             workers=1)
-                '''print("ENTRENANDO EL FRANCÉS")
+                '''for layer in model_to_train.layers:
+                    print(layer.get_config(), layer.get_weights())'''
+
+
+                
+                print("ENTRENANDO EL FRANCÉS")
                 self.model_language = 1
                 generator_output2 = next(trains_gen[1])
                 x2, y2, sample_weight2 = generator_output2
@@ -1405,7 +1410,9 @@ class Model_Wrapper(object):
                                             validation_steps=n_valid_samples,
                                             class_weight=class_weight,
                                             max_queue_size=params['n_parallel_loaders'],
-                                            workers=1)'''
+                                            workers=1)
+                '''for layer in model_to_train.layers:
+                    print(layer.get_config(), layer.get_weights())'''
             '''print("Se entrenará el primer lenguaje")
             self.model_language = 0
             model_to_train.fit_generator(trains_gen[0],
