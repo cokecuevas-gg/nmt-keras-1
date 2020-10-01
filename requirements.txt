@@ -7,7 +7,6 @@ keras_preprocessing
 future
 h5py
 matplotlib
-multimodal-keras-wrapper
 numpy
 scikit-image
 scikit-learn
