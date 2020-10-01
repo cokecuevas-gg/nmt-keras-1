@@ -13,8 +13,16 @@ def load_parameters():
     SRCS_LAN = ['en']
     TRGS_LAN = ['es','fr']                                 # Language of the target text.
     MULTILANGUAGE = 1
+<<<<<<< HEAD
     # SRC_LAN or TRG_LAN will be added to the file names
     TEXT_FILES = {'train': 'training.',        # Data files
+=======
+    #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuroTrans_full' #% (TA, DATASET_NAME)  # Path where data is stored.
+    DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/nmt-keras/examples/EuTrans'
+    #DATA_ROOT_PATH = '/Users/coke/Desktop/UPV/Tesis/TA/Practica2/Data/EuTrans'
+    # SRC_LAN or TRG_LAN will be added to the file names.
+    TEXT_FILES = {'train': 'training.',             # Data files.
+>>>>>>> f25d3ab359414ebefcf14c0516862b56fb279454
                   'val': 'dev.',
                   'test': 'test.'}
 
@@ -148,8 +156,13 @@ def load_parameters():
     WARMUP_EXP = -1.5                             # Warmup steps for noam decay.
 
     # Training parameters
+<<<<<<< HEAD
     MAX_EPOCH = 100                               # Stop when computed this number of epochs.
     BATCH_SIZE = 60                               # Size of each minibatch.
+=======
+    MAX_EPOCH = 10                             # Stop when computed this number of epochs.
+    BATCH_SIZE =  64                            # Size of each minibatch.
+>>>>>>> f25d3ab359414ebefcf14c0516862b56fb279454
     N_GPUS = 1                                    # Number of GPUs to use. Only for Tensorflow backend. Each GPU will receive mini-batches of BATCH_SIZE / N_GPUS.
 
     HOMOGENEOUS_BATCHES = False                   # Use batches with homogeneous output lengths (Dangerous!!).

@@ -724,6 +724,7 @@ class Model_Wrapper(object):
             :param optimizer: string identifying the type of optimizer used (default: SGD)
             :param sample_weight_mode: 'temporal' or None
         """
+        print(janik)
         # Pick default parameters
         if lr is None:
             lr = self.lr
@@ -1363,10 +1364,10 @@ class Model_Wrapper(object):
                                          initial_epoch=params['epoch_offset'])
         else:
             # Keras 2.x version
+            epochs = 3
             for i in range(0,int(params['n_epochs'])): #while not convergence??
                 # Store model
                 self.epoch_counter = i+1
-                print("EPOCH: ",self.epoch_counter)
                 if params['epochs_for_save'] >= 0:
                     callback_store_model = StoreModelWeightsOnEpochEnd(self, saveModel, params['epochs_for_save'])
                     if self.epoch_counter == 1:
@@ -1376,13 +1377,14 @@ class Model_Wrapper(object):
                         multi_callbacks[0][0]=callback_store_model
                         multi_callbacks[1][0]=callback_store_model
                 print("ENTRENANDO EL ESPAÑOL")
+
                 self.model_language = 0
                 generator_output = next(trains_gen[0])
                 x, y, sample_weight = generator_output
                 model_to_train.fit(x,y,steps_per_epoch=state['n_iterations_per_epoch'],
                                             sample_weight=sample_weight,
-                                            epochs=self.epoch_counter,
-                                            initial_epoch = self.epoch_counter - 1,
+                                            epochs=epochs*self.epoch_counter,
+                                            initial_epoch = epochs*self.epoch_counter - epochs,
                                             verbose=params['verbose'],
                                             callbacks=multi_callbacks[0],
                                             validation_data=val_gen,
@@ -1399,8 +1401,8 @@ class Model_Wrapper(object):
                 x2, y2, sample_weight2 = generator_output2
                 model_to_train2.fit(x2,y2,steps_per_epoch=state['n_iterations_per_epoch'],
                                             sample_weight=sample_weight2,
-                                            epochs=self.epoch_counter,
-                                            initial_epoch = self.epoch_counter - 1,
+                                            epochs=epochs*self.epoch_counter,
+                                            initial_epoch = epochs*self.epoch_counter - epochs,
                                             verbose=params['verbose'],
                                             callbacks=multi_callbacks[1],
                                             validation_data=val_gen,
