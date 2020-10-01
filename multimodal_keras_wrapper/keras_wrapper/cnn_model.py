@@ -1364,7 +1364,7 @@ class Model_Wrapper(object):
                                          initial_epoch=params['epoch_offset'])
         else:
             # Keras 2.x version
-            epochs = 3
+            epochs = 5
             for i in range(0,int(params['n_epochs'])): #while not convergence??
                 # Store model
                 self.epoch_counter = i+1
@@ -1376,15 +1376,15 @@ class Model_Wrapper(object):
                     else:
                         multi_callbacks[0][0]=callback_store_model
                         multi_callbacks[1][0]=callback_store_model
-                print("ENTRENANDO EL ESPAÑOL")
-
-                self.model_language = 0
+                 #print("ENTRENANDO EL ESPAÑOL")
+		
+                '''self.model_language = 0
                 generator_output = next(trains_gen[0])
                 x, y, sample_weight = generator_output
                 model_to_train.fit(x,y,steps_per_epoch=states[self.model_language]['n_iterations_per_epoch'],
                                             sample_weight=sample_weight,
-                                            epochs=epochs*self.epoch_counter,
-                                            initial_epoch = epochs*self.epoch_counter - epochs,
+                                            epochs=params['n_epochs'],
+                                            initial_epoch = params['epoch_offset'],
                                             verbose=params['verbose'],
                                             callbacks=multi_callbacks[0],
                                             validation_data=val_gen,
@@ -1392,8 +1392,6 @@ class Model_Wrapper(object):
                                             class_weight=class_weight,
                                             max_queue_size=params['n_parallel_loaders'],
                                             workers=1)
-                '''for layer in model_to_train.layers:
-                    print(layer.get_config(), layer.get_weights())'''
                 
                 print("ENTRENANDO EL FRANCÉS")
                 self.model_language = 1
@@ -1409,35 +1407,33 @@ class Model_Wrapper(object):
                                             validation_steps=n_valid_samples,
                                             class_weight=class_weight,
                                             max_queue_size=params['n_parallel_loaders'],
-                                            workers=1)
-                '''for layer in model_to_train.layers:
-                    print(layer.get_config(), layer.get_weights())'''
-            '''print("Se entrenará el primer lenguaje")
-            self.model_language = 0
-            model_to_train.fit_generator(trains_gen[0],
-                                         steps_per_epoch=state['n_iterations_per_epoch'],
-                                         epochs=params['n_epochs'],
-                                         verbose=params['verbose'],
-                                         callbacks=multi_callbacks[0],
-                                         validation_data=val_gen,
-                                         validation_steps=n_valid_samples,
-                                         class_weight=class_weight,
-                                         max_queue_size=params['n_parallel_loaders'],
-                                         workers=1,
-                                         initial_epoch=params['epoch_offset'])
-            print("FIN DEL PRIMER MODELO, AHORA EL SEGUNDO")
-            self.model_language = 1
-            model_to_train2.fit_generator(trains_gen[1],
-                                         steps_per_epoch=state['n_iterations_per_epoch'],
-                                         epochs=params['n_epochs'],
-                                         verbose=params['verbose'],
-                                         callbacks=multi_callbacks[1],
-                                         validation_data=val_gen,
-                                         validation_steps=n_valid_samples,
-                                         class_weight=class_weight,
-                                         max_queue_size=params['n_parallel_loaders'],
-                                         workers=1,
-                                         initial_epoch=params['epoch_offset'])'''
+                                            workers=1)'''
+                print("Se entrenará el Español")
+                self.model_language = 0
+                model_to_train.fit_generator(trains_gen[0],
+                                           steps_per_epoch=states[0]['n_iterations_per_epoch'],
+                                           epochs=1,
+                                           verbose=params['verbose'],
+                                           callbacks=multi_callbacks[0],
+                                           validation_data=val_gen,
+                                           validation_steps=n_valid_samples,
+                                           class_weight=class_weight,
+                                           max_queue_size=params['n_parallel_loaders'],
+                                           workers=1,
+                                           initial_epoch=params['epoch_offset']),
+                self.model_language = 1
+                print("Se entrenará el Francés")
+                model_to_train2.fit_generator(trains_gen[1],
+                                           steps_per_epoch=states[1]['n_iterations_per_epoch'],
+                                           epochs=1,
+                                           verbose=params['verbose'],
+                                           callbacks=multi_callbacks[1],
+                                           validation_data=val_gen,
+                                           validation_steps=n_valid_samples,
+                                           class_weight=class_weight,
+                                           max_queue_size=params['n_parallel_loaders'],
+                                           workers=1,
+                                           initial_epoch=params['epoch_offset'])
 
                                 
     def __train_from_samples(self, x, y, params, class_weight=None, sample_weight=None):

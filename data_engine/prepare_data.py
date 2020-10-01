@@ -332,7 +332,7 @@ def build_dataset_multilanguage(params):
                                         id=params['INPUTS_IDS_DATASET'][-1],
                                         required=False)
                     if params.get('ALIGN_FROM_RAW', True) and not params.get('HOMOGENEOUS_BATCHES', False):
-                        ds.setRawInput(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+ params['SRC_LAN'],
+                        ds.setRawInput(base_path + '/' + params['TEXT_FILES'][split] + target_l+"."+ source_l,
                                     split,
                                     type='file-name',
                                     id='raw_' + params['INPUTS_IDS_DATASET'][0])
