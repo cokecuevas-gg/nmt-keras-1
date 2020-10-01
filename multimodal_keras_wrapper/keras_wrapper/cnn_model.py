@@ -1212,8 +1212,8 @@ class Model_Wrapper(object):
 
     def __train_multi_decoder(self, ds, multi_params, state=None):
         if state is None:
-            state = dict()
-        
+            states=dictlist = [dict() for x in range(len(ds))]
+
         for params in multi_params:
             if params['verbose'] > 0:
                 logger.info(print_dict(params, header="Training parameters: "))
@@ -1290,14 +1290,14 @@ class Model_Wrapper(object):
 
         # Prepare data generators
         trains_gen = []
-        for dataset in ds:
-            # initialize state
-            state['samples_per_epoch'] = dataset.len_train
-            state['n_iterations_per_epoch'] = int(math.ceil(float(state['samples_per_epoch']) / params['batch_size']))
+        for i,dataset in enumerate(ds):
+        # initialize state
+            states[i]['samples_per_epoch'] = dataset.len_train
+            states[i]['n_iterations_per_epoch'] = int(math.ceil(float(states[i]['samples_per_epoch']) / params['batch_size']))
             train_gen = Data_Batch_Generator('train',
                                                     self,
                                                     dataset,
-                                                    state['n_iterations_per_epoch'],
+                                                    states[i]['n_iterations_per_epoch'],
                                                     batch_size=params['batch_size'],
                                                     normalization=params['normalize'],
                                                     normalization_type=params['normalization_type'],
@@ -1381,7 +1381,7 @@ class Model_Wrapper(object):
                 self.model_language = 0
                 generator_output = next(trains_gen[0])
                 x, y, sample_weight = generator_output
-                model_to_train.fit(x,y,steps_per_epoch=state['n_iterations_per_epoch'],
+                model_to_train.fit(x,y,steps_per_epoch=states[self.model_language]['n_iterations_per_epoch'],
                                             sample_weight=sample_weight,
                                             epochs=epochs*self.epoch_counter,
                                             initial_epoch = epochs*self.epoch_counter - epochs,
@@ -1399,7 +1399,7 @@ class Model_Wrapper(object):
                 self.model_language = 1
                 generator_output2 = next(trains_gen[1])
                 x2, y2, sample_weight2 = generator_output2
-                model_to_train2.fit(x2,y2,steps_per_epoch=state['n_iterations_per_epoch'],
+                model_to_train2.fit(x2,y2,steps_per_epoch=states[self.model_language]['n_iterations_per_epoch'],
                                             sample_weight=sample_weight2,
                                             epochs=epochs*self.epoch_counter,
                                             initial_epoch = epochs*self.epoch_counter - epochs,
