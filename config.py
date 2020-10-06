@@ -3,6 +3,7 @@ def load_parameters():
     Loads the defined hyperparameters
     :return parameters: Dictionary of loaded parameters
     """
+<<<<<<< HEAD
 
     # Input data params
     TASK_NAME = 'Decoders_Tesis_BPE_30_SINGLE'                           # Task name
@@ -16,10 +17,26 @@ def load_parameters():
     MULTILANGUAGE = 1
     # SRC_LAN or TRG_LAN will be added to the file names
     TEXT_FILES = {'train': 'training.',        # Data files
+=======
+
+
+    # Input data params
+    TASK_NAME = 'EuTrans'                           # Task name.
+    DATASET_NAME = TASK_NAME                        # Dataset name.
+    SRC_LAN = 'en'                                  # Language of the source text.
+    TRG_LAN = 'es'                                  # Language of the target text.
+    DATA_ROOT_PATH = 'prueba/nmt-keras/examples/EuTrans/'
+    SRCS_LAN = ['en']
+    TRGS_LAN = ['es','fr']                                 # Language of the target text.
+    MULTILANGUAGE = 1
+    # SRC_LAN or TRG_LAN will be added to the file names.
+    TEXT_FILES = {'train': 'training.',             # Data files.
+>>>>>>> 342cfbdc21fe142d84ec75870e16c544b5c7549b
                   'val': 'dev.',
                   'test': 'test.'}
 
     # Dataset class parameters
+<<<<<<< HEAD
     INPUTS_IDS_DATASET = ['source_text', 'state_below']     # Corresponding inputs of the dataset
     OUTPUTS_IDS_DATASET = ['target_text']                   # Corresponding outputs of the dataset
     INPUTS_IDS_MODEL = ['source_text', 'state_below']       # Corresponding inputs of the built model
@@ -32,6 +49,22 @@ def load_parameters():
     START_EVAL_ON_EPOCH = 1                       # First epoch to start the model evaluation
     EVAL_EACH_EPOCHS = True                      # Select whether evaluate between N epochs or N updates
     EVAL_EACH = 1                              # Sets the evaluation frequency (epochs or updates)
+=======
+    INPUTS_IDS_DATASET = ['source_text', 'state_below']        # Corresponding inputs of the dataset.
+    OUTPUTS_IDS_DATASET = ['target_text']                      # Corresponding outputs of the dataset.
+    INPUTS_IDS_MODEL = ['source_text', 'state_below']          # Corresponding inputs of the built model.
+    OUTPUTS_IDS_MODEL = ['target_text']                        # Corresponding outputs of the built model.
+    INPUTS_TYPES_DATASET = ['text-features', 'text-features']  # Corresponding types of the data. 'text' or 'text-features' allowed.
+    OUTPUTS_TYPES_DATASET = ['text-features']                  # They are equivalent, only differ on how the data is loaded.
+
+    # Evaluation params
+    METRICS = ['coco']                            # Metric used for evaluating the model.
+    EVAL_ON_SETS = ['val']                        # Possible values: 'train', 'val' and 'test' (external evaluator).
+    EVAL_ON_SETS_KERAS = []                       # Possible values: 'train', 'val' and 'test' (Keras' evaluator). Untested..
+    START_EVAL_ON_EPOCH = 1                       # First epoch to start the model evaluation.
+    EVAL_EACH_EPOCHS = True                       # Select whether evaluate between N epochs or N updates.
+    EVAL_EACH = 1                                 # Sets the evaluation frequency (epochs or updates).
+>>>>>>> 342cfbdc21fe142d84ec75870e16c544b5c7549b
 
     # Search parameters
     SAMPLING = 'max_likelihood'                   # Possible values: multinomial or max_likelihood (recommended)
@@ -59,11 +92,19 @@ def load_parameters():
     NORMALIZE_SAMPLING = False                    # Normalize hypotheses scores according to their length:
     ALPHA_FACTOR = .6                             # Normalization according to |h|**ALPHA_FACTOR
 
+<<<<<<< HEAD
     # Sampling params: Show some samples during training
     SAMPLE_ON_SETS = ['train', 'val']             # Possible values: 'train', 'val' and 'test'
     N_SAMPLES = 5                                 # Number of samples generated
     START_SAMPLING_ON_EPOCH = 2                   # First epoch where to start the sampling counter
     SAMPLE_EACH_UPDATES = 10000                     # Sampling frequency (always in #updates)
+=======
+    # Sampling params: Show some samples during training.
+    SAMPLE_ON_SETS = ['train', 'val']             # Possible values: 'train', 'val' and 'test'.
+    N_SAMPLES = 5                                 # Number of samples generated.
+    START_SAMPLING_ON_EPOCH = 1                   # First epoch where to start the sampling counter.
+    SAMPLE_EACH_UPDATES = 300                     # Sampling frequency (always in #updates).
+>>>>>>> 342cfbdc21fe142d84ec75870e16c544b5c7549b
 
     # Unknown words treatment
     POS_UNK = True                               # Enable POS_UNK strategy for unknown words
@@ -122,7 +163,11 @@ def load_parameters():
 
     OPTIMIZER = 'Adam'                            # Optimizer. Supported optimizers: SGD, RMSprop, Adagrad, Adadelta, Adam, Adamax, Nadam.
     LR = 0.001                                    # Learning rate. Recommended values - Adam 0.0002 - Adadelta 1.0.
+<<<<<<< HEAD
     CLIP_C = 5.                                   # During training, clip L2 norm of gradients to this value (0. means deactivated).
+=======
+    CLIP_C = 1.                                   # During training, clip L2 norm of gradients to this value (0. means deactivated).
+>>>>>>> 342cfbdc21fe142d84ec75870e16c544b5c7549b
     CLIP_V = 0.                                   # During training, clip absolute value of gradients to this value (0. means deactivated).
     USE_TF_OPTIMIZER = True                       # Use native Tensorflow's optimizer (only for the Tensorflow backend).
 
@@ -149,8 +194,13 @@ def load_parameters():
     WARMUP_EXP = -1.5                             # Warmup steps for noam decay.
 
     # Training parameters
+<<<<<<< HEAD
     MAX_EPOCH = 2                               # Stop when computed this number of epochs.
     BATCH_SIZE = 100                               # Size of each minibatch.
+=======
+    MAX_EPOCH = 5                               # Stop when computed this number of epochs.
+    BATCH_SIZE = 50                               # Size of each minibatch.
+>>>>>>> 342cfbdc21fe142d84ec75870e16c544b5c7549b
     N_GPUS = 1                                    # Number of GPUs to use. Only for Tensorflow backend. Each GPU will receive mini-batches of BATCH_SIZE / N_GPUS.
 
     HOMOGENEOUS_BATCHES = False                   # Use batches with homogeneous output lengths (Dangerous!!).
@@ -161,8 +211,13 @@ def load_parameters():
     SAVE_EACH_EVALUATION = True                   # Save each time we evaluate the model.
 
     # Early stop parameters
+<<<<<<< HEAD
     EARLY_STOP = False                             # Turns on/off the early stop protocol.
     PATIENCE = 10                                 # We'll stop if the val STOP_METRIC does not improve after this.
+=======
+    EARLY_STOP = True                             # Turns on/off the early stop protocol.
+    PATIENCE = 20                                 # We'll stop if the val STOP_METRIC does not improve after this.
+>>>>>>> 342cfbdc21fe142d84ec75870e16c544b5c7549b
                                                   # number of evaluations.
     STOP_METRIC = 'Bleu_4'                        # Metric for the stop.
 
@@ -207,7 +262,7 @@ def load_parameters():
     # AttentionRNNEncoderDecoder model hyperparameters
     # # # # # # # # # # # # # # # # # # # # # # # #
     ENCODER_RNN_TYPE = 'LSTM'                     # Encoder's RNN unit type ('LSTM' and 'GRU' supported).
-    USE_CUDNN = False                              # Use CuDNN's implementation of GRU and LSTM (only for Tensorflow backend).
+    USE_CUDNN = True                              # Use CuDNN's implementation of GRU and LSTM (only for Tensorflow backend).
 
     DECODER_RNN_TYPE = 'ConditionalLSTM'          # Decoder's RNN unit type.
                                                   # ('LSTM', 'GRU', 'ConditionalLSTM' and 'ConditionalGRU' supported).

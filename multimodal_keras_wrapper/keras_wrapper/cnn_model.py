@@ -1371,8 +1371,6 @@ class Model_Wrapper(object):
                                          initial_epoch=params['epoch_offset'])
         else:
             # Keras 2.x version
-            model_to_train.continue_training = True
-            model_to_train2.continue_training = True
             for i in range(0,int(params['n_epochs'])): #while not convergence??
                 # Store model
                 self.epoch_counter = i+1
