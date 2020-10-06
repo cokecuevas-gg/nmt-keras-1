@@ -724,7 +724,6 @@ class Model_Wrapper(object):
             :param optimizer: string identifying the type of optimizer used (default: SGD)
             :param sample_weight_mode: 'temporal' or None
         """
-        print(janik)
         # Pick default parameters
         if lr is None:
             lr = self.lr
@@ -1290,6 +1289,7 @@ class Model_Wrapper(object):
 
         # Prepare data generators
         trains_gen = []
+        vals_gen = []
         for i,dataset in enumerate(ds):
         # initialize state
             states[i]['samples_per_epoch'] = dataset.len_train
@@ -1308,36 +1308,43 @@ class Model_Wrapper(object):
                                                     mean_substraction=params['mean_substraction'],
                                                     shuffle=params['shuffle']).generator()
             trains_gen.append(train_gen)
-        # Are we going to validate on 'val' data?
-        if False:  # TODO: loss calculation on val set is deactivated
-            # if 'val' in params['eval_on_sets']:
-            # Calculate how many validation iterations are we going to perform per test
-            n_valid_samples = ds[0].len_val
-            if params['num_iterations_val'] is None:
-                params['num_iterations_val'] = int(math.ceil(float(n_valid_samples) / params['batch_size']))
+            # Are we going to validate on 'val' data?
+            if params['eval_on_sets']:
+                print("ENTRÓ A LA VALIDACIÓN")
+                # Calculate how many validation iterations are we going to perform per test
+                n_valid_samples = dataset.len_val
+                if params['num_iterations_val'] is None:
+                    params['num_iterations_val'] = int(math.ceil(float(n_valid_samples) / params['batch_size']))
 
-            # prepare data generator
-            if params['n_parallel_loaders'] > 1:
-                val_gen = Parallel_Data_Batch_Generator('val', self, ds, params['num_iterations_val'],
-                                                        batch_size=params['batch_size'],
-                                                        normalization=params['normalize'],
-                                                        normalization_type=params['normalization_type'],
-                                                        data_augmentation=False,
-                                                        mean_substraction=params['mean_substraction'],
-                                                        shuffle=False,
-                                                        n_parallel_loaders=params['n_parallel_loaders']).generator()
+                # prepare data generator
+                if params['n_parallel_loaders'] > 1:
+                    val_gen = Parallel_Data_Batch_Generator(params['eval_on_sets'],
+                                                            self,
+                                                            ds,
+                                                            params['num_iterations_val'],
+                                                            batch_size=params['batch_size'],
+                                                            normalization=params['normalize'],
+                                                            normalization_type=params['normalization_type'],
+                                                            data_augmentation=False,
+                                                            mean_substraction=params['mean_substraction'],
+                                                            shuffle=False,
+                                                            n_parallel_loaders=params['n_parallel_loaders']).generator()
+                else:
+                    print("ENTRÓ A LA VALIDACIÓN NO PARALELA")
+                    val_gen = Data_Batch_Generator(params['eval_on_sets'],
+                                                self,
+                                                dataset,
+                                                params['num_iterations_val'],
+                                                batch_size=params['batch_size'],
+                                                normalization=params['normalize'],
+                                                normalization_type=params['normalization_type'],
+                                                data_augmentation=False,
+                                                mean_substraction=params['mean_substraction'],
+                                                shuffle=False).generator()
             else:
-                val_gen = Data_Batch_Generator('val', self, ds, params['num_iterations_val'],
-                                               batch_size=params['batch_size'],
-                                               normalization=params['normalize'],
-                                               normalization_type=params['normalization_type'],
-                                               data_augmentation=False,
-                                               mean_substraction=params['mean_substraction'],
-                                               shuffle=False).generator()
-        else:
-            val_gen = None
-            n_valid_samples = None
-
+                val_gen = None
+                n_valid_samples = None
+            vals_gen.append(val_gen)
         # Are we going to use class weights?
         class_weight = {}
         if params['class_weights'] is not None:
@@ -1364,10 +1371,12 @@ class Model_Wrapper(object):
                                          initial_epoch=params['epoch_offset'])
         else:
             # Keras 2.x version
-            epochs = 3
+            model_to_train.continue_training = True
+            model_to_train2.continue_training = True
             for i in range(0,int(params['n_epochs'])): #while not convergence??
                 # Store model
                 self.epoch_counter = i+1
+                print("Inicia epoca: "+str(self.epoch_counter)+"/"+str(int(params['n_epochs'])))
                 if params['epochs_for_save'] >= 0:
                     callback_store_model = StoreModelWeightsOnEpochEnd(self, saveModel, params['epochs_for_save'])
                     if self.epoch_counter == 1:
@@ -1376,68 +1385,33 @@ class Model_Wrapper(object):
                     else:
                         multi_callbacks[0][0]=callback_store_model
                         multi_callbacks[1][0]=callback_store_model
-                print("ENTRENANDO EL ESPAÑOL")
 
+                print("Se entrenará el español")
                 self.model_language = 0
-                generator_output = next(trains_gen[0])
-                x, y, sample_weight = generator_output
-                model_to_train.fit(x,y,steps_per_epoch=states[self.model_language]['n_iterations_per_epoch'],
-                                            sample_weight=sample_weight,
-                                            epochs=epochs*self.epoch_counter,
-                                            initial_epoch = epochs*self.epoch_counter - epochs,
-                                            verbose=params['verbose'],
-                                            callbacks=multi_callbacks[0],
-                                            validation_data=val_gen,
-                                            validation_steps=n_valid_samples,
-                                            class_weight=class_weight,
-                                            max_queue_size=params['n_parallel_loaders'],
-                                            workers=1)
-                '''for layer in model_to_train.layers:
-                    print(layer.get_config(), layer.get_weights())'''
-                
-                print("ENTRENANDO EL FRANCÉS")
+                model_to_train.fit_generator(trains_gen[0],
+                                           steps_per_epoch=states[0]['n_iterations_per_epoch'],
+                                           epochs=1,
+                                           verbose=params['verbose'],
+                                           callbacks=multi_callbacks[0],
+                                           validation_data=vals_gen[0],
+                                           validation_steps=n_valid_samples,
+                                           class_weight=class_weight,
+                                           max_queue_size=params['n_parallel_loaders'],
+                                           workers=1,
+                                           initial_epoch=params['epoch_offset'])
+                print("Se entrenará el francés")
                 self.model_language = 1
-                generator_output2 = next(trains_gen[1])
-                x2, y2, sample_weight2 = generator_output2
-                model_to_train2.fit(x2,y2,steps_per_epoch=states[self.model_language]['n_iterations_per_epoch'],
-                                            sample_weight=sample_weight2,
-                                            epochs=epochs*self.epoch_counter,
-                                            initial_epoch = epochs*self.epoch_counter - epochs,
+                model_to_train2.fit_generator(trains_gen[1],
+                                            steps_per_epoch=states[1]['n_iterations_per_epoch'],
+                                            epochs=1,
                                             verbose=params['verbose'],
                                             callbacks=multi_callbacks[1],
-                                            validation_data=val_gen,
+                                            validation_data=vals_gen[1],
                                             validation_steps=n_valid_samples,
                                             class_weight=class_weight,
                                             max_queue_size=params['n_parallel_loaders'],
-                                            workers=1)
-                '''for layer in model_to_train.layers:
-                    print(layer.get_config(), layer.get_weights())'''
-            '''print("Se entrenará el primer lenguaje")
-            self.model_language = 0
-            model_to_train.fit_generator(trains_gen[0],
-                                         steps_per_epoch=state['n_iterations_per_epoch'],
-                                         epochs=params['n_epochs'],
-                                         verbose=params['verbose'],
-                                         callbacks=multi_callbacks[0],
-                                         validation_data=val_gen,
-                                         validation_steps=n_valid_samples,
-                                         class_weight=class_weight,
-                                         max_queue_size=params['n_parallel_loaders'],
-                                         workers=1,
-                                         initial_epoch=params['epoch_offset'])
-            print("FIN DEL PRIMER MODELO, AHORA EL SEGUNDO")
-            self.model_language = 1
-            model_to_train2.fit_generator(trains_gen[1],
-                                         steps_per_epoch=state['n_iterations_per_epoch'],
-                                         epochs=params['n_epochs'],
-                                         verbose=params['verbose'],
-                                         callbacks=multi_callbacks[1],
-                                         validation_data=val_gen,
-                                         validation_steps=n_valid_samples,
-                                         class_weight=class_weight,
-                                         max_queue_size=params['n_parallel_loaders'],
-                                         workers=1,
-                                         initial_epoch=params['epoch_offset'])'''
+                                            workers=1,
+                                            initial_epoch=params['epoch_offset'])
 
                                 
     def __train_from_samples(self, x, y, params, class_weight=None, sample_weight=None):
@@ -2203,7 +2177,8 @@ class Model_Wrapper(object):
                 sys.stdout.write('The sampling took: %f secs (Speed: %f sec/sample)\n' % ((time.time() - start_time), (time.time() - start_time) / n_samples))
 
                 sys.stdout.flush()
-
+                print(eval('ds.loaded_raw_' + s + '[0]'))
+                print(eval('ds.X_raw_' + s + '["raw_' + params['model_inputs'][0] + '"]'))
                 if params['pos_unk']:
                     if eval('ds.loaded_raw_' + s + '[0]'):
                         sources = file2list(eval('ds.X_raw_' + s + '["raw_' + params['model_inputs'][0] + '"]'),

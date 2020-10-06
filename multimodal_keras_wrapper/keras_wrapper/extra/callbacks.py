@@ -968,6 +968,8 @@ class EarlyStopping(KerasCallback):
         elif self.patience > 0:
             self.wait += 1
             logger.info('---bad counter: %d/%d' % (self.wait, self.patience))
+            if self.wait == self.patience-1:
+                self.model.continue_training = False
             if self.wait >= self.patience:
                 if self.verbose > 0:
                     logger.info(

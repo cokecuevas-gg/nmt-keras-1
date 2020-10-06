@@ -2,7 +2,11 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+hyp.*
+*.png
+trained_model/
+trained_model
+traned_models/
 # C extensions
 *.so
 
