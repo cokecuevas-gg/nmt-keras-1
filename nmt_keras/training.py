@@ -5,7 +5,7 @@ import jsonpickle
 from nmt_keras.model_zoo import TranslationModel
 from keras_wrapper.extra.read_write import dict2pkl
 from keras_wrapper.dataset import loadDataset, saveDataset
-from keras_wrapper.cnn_model import updateModel
+from keras_wrapper.cnn_model import updateModel,updateModelMultiway
 from data_engine.prepare_data import build_dataset, update_dataset_from_file, build_dataset_multilanguage
 from six import iteritems
 from timeit import default_timer as timer
@@ -37,7 +37,10 @@ def train_model(params, load_dataset=None):
         if load_dataset is None:
             if params['REBUILD_DATASET']:
                 logger.info('Rebuilding dataset.')
-                dataset = build_dataset(params)
+                if params['MULTILANGUAGE'] == 0:
+                    dataset = build_dataset(params)
+                else:
+                    datasets = build_dataset_multilanguage(params)
             else:
                 logger.info('Updating dataset.')
                 dataset = loadDataset(
@@ -138,8 +141,10 @@ def train_model(params, load_dataset=None):
     print("____________________________________________")
     print(datasets[1])
     if params['RELOAD'] > 0:
-        nmt_model = updateModel(
-            nmt_model, params['STORE_PATH'], params['RELOAD'], reload_epoch=params['RELOAD_EPOCH'])
+        if params['MULTILANGUAGE'] != 1:
+            nmt_model = updateModel(nmt_model, params['STORE_PATH'], params['RELOAD'], reload_epoch=params['RELOAD_EPOCH'])
+        else:
+            nmt_model = updateModelMultiway(nmt_model, params['STORE_PATH'], params['RELOAD'], reload_epoch=params['RELOAD_EPOCH'])
         nmt_model.setParams(params)
         nmt_model.setOptimizer()
         if params.get('EPOCH_OFFSET') is None:

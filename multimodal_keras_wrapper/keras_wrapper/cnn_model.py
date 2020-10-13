@@ -263,6 +263,70 @@ def loadModel(model_path, update_num, reload_epoch=True, custom_objects=None, fu
     logger.info("<<< Model loaded in %0.6s seconds. >>>" % str(time.time() - t))
     return model_wrapper
 
+def updateModelMultiway(model, model_path, update_num, reload_epoch=True, full_path=False, compile_model=False):
+    """
+    Loads a the weights from files to a Model_Wrapper object.
+
+    :param model: Model_Wrapper object to update
+    :param model_path: path to the weights to load
+    :param update_num: identifier of the number of iterations/updates/epochs elapsed
+    :param reload_epoch: Whether we should load epochs or updates
+    :param full_path: Whether we should load the path from model_name or from model_path directly.
+    :return: updated Model_Wrapper
+    """
+    t = time.time()
+    model_name = model.name
+    iteration = str(update_num)
+
+    if not full_path:
+        if reload_epoch:
+            model_path = model_path + "/epoch_" + iteration
+        else:
+            model_path = model_path + "/update_" + iteration
+
+    logger.info("<<< Updating model " + model_name + " from " + model_path + " ... >>>")
+
+    try:
+        logger.info("<<< Updating model from " + model_path + ".h5 ... >>>")
+        model.model.set_weights(load_model(model_path +'_0'+ '.h5', compile=False).get_weights())
+        model.model2.set_weights(load_model(model_path +'_1'+ '.h5', compile=False).get_weights())
+    except Exception as e:
+        logger.info(str(e))
+        # Load model structure
+        logger.info("<<< Failed -> Loading model from " + model_path + "_weights.h5' ... >>>")
+        # Load model weights
+        model.model.load_weights(model_path +'_0'+ '_weights.h5')
+        model.model2.load_weights(model_path +'_1'+ '_weights.h5')
+
+    # Load auxiliary models for optimized search
+    if os.path.exists(model_name + '_init.h5') and os.path.exists(model_name + '_next.h5'):
+        loading_optimized = 1
+    elif os.path.exists(model_name + '_weights_init.h5') and os.path.exists(model_name + '_weights_next.h5'):
+        loading_optimized = 2
+    else:
+        loading_optimized = 0
+
+    if loading_optimized != 0:
+        logger.info("<<< Updating optimized model... >>>")
+        if loading_optimized == 1:
+            logger.info("\t <<< Updating model_init from " + model_path + "_init.h5 ... >>>")
+            model.model_init.set_weights(load_model(model_path +'_0'+ '_init.h5', compile=False).get_weights())
+            model.model_init.set_weights(load_model(model_path +'_1'+ '_init.h5', compile=False).get_weights())
+            logger.info("\t <<< Updating model_next from " + model_path + "_next.h5 ... >>>")
+            model.model_next.set_weights(load_model(model_path +'_0'+ '_next.h5', compile=False).get_weights())
+            model.model_next.set_weights(load_model(model_path +'_1'+ '_next.h5', compile=False).get_weights())
+        elif loading_optimized == 2:
+            logger.info("\t <<< Updating model_init from " + model_path + "_structure_init.json ... >>>")
+            model.model_init.load_weights(model_path +'_0'+ '_weights_init.h5')
+            model.model_init.load_weights(model_path +'_1'+ '_weights_init.h5')
+            # Load model structure
+            logger.info("\t <<< Updating model_next from " + model_path + "_structure_next.json ... >>>")
+            # Load model weights
+            model.model_next.load_weights(model_path +'_0'+ '_weights_next.h5')
+            model.model_next.load_weights(model_path +'_1'+ '_weights_next.h5')
+
+    logger.info("<<< Model updated in %0.6s seconds. >>>" % str(time.time() - t))
+    return model
 
 def updateModel(model, model_path, update_num, reload_epoch=True, full_path=False, compile_model=False):
     """
@@ -1383,33 +1447,60 @@ class Model_Wrapper(object):
                     else:
                         multi_callbacks[0][0]=callback_store_model
                         multi_callbacks[1][0]=callback_store_model
-
-                print("Se entrenará el español")
-                self.model_language = 0
-                model_to_train.fit_generator(trains_gen[0],
-                                           steps_per_epoch=states[0]['n_iterations_per_epoch'],
-                                           epochs=1,
-                                           verbose=params['verbose'],
-                                           callbacks=multi_callbacks[0],
-                                           validation_data=vals_gen[0],
-                                           validation_steps=n_valid_samples,
-                                           class_weight=class_weight,
-                                           max_queue_size=params['n_parallel_loaders'],
-                                           workers=1,
-                                           initial_epoch=params['epoch_offset'])
-                print("Se entrenará el francés")
-                self.model_language = 1
-                model_to_train2.fit_generator(trains_gen[1],
-                                            steps_per_epoch=states[1]['n_iterations_per_epoch'],
+                if params['reload_epoch'] == 0:
+                    print("Se entrenará el español")
+                    self.model_language = 0
+                    model_to_train.fit_generator(trains_gen[0],
+                                            steps_per_epoch=states[0]['n_iterations_per_epoch'],
                                             epochs=1,
                                             verbose=params['verbose'],
-                                            callbacks=multi_callbacks[1],
-                                            validation_data=vals_gen[1],
+                                            callbacks=multi_callbacks[0],
+                                            validation_data=vals_gen[0],
                                             validation_steps=n_valid_samples,
                                             class_weight=class_weight,
                                             max_queue_size=params['n_parallel_loaders'],
                                             workers=1,
                                             initial_epoch=params['epoch_offset'])
+                    print("Se entrenará el francés")
+                    self.model_language = 1
+                    model_to_train2.fit_generator(trains_gen[1],
+                                                steps_per_epoch=states[1]['n_iterations_per_epoch'],
+                                                epochs=1,
+                                                verbose=params['verbose'],
+                                                callbacks=multi_callbacks[1],
+                                                validation_data=vals_gen[1],
+                                                validation_steps=n_valid_samples,
+                                                class_weight=class_weight,
+                                                max_queue_size=params['n_parallel_loaders'],
+                                                workers=1,
+                                                initial_epoch=params['epoch_offset'])
+                else:
+                    print("Se entrenará el español en reload epoch: ",params['reload_epoch'])
+                    self.model_language = 0
+                    model_to_train.fit_generator(trains_gen[0],
+                                            steps_per_epoch=states[0]['n_iterations_per_epoch'],
+                                            epochs=1,
+                                            verbose=params['verbose'],
+                                            callbacks=multi_callbacks[0],
+                                            validation_data=vals_gen[0],
+                                            validation_steps=n_valid_samples,
+                                            class_weight=class_weight,
+                                            max_queue_size=params['n_parallel_loaders'],
+                                            workers=1,
+                                            initial_epoch=0)
+                    print("Se entrenará el francés")
+                    self.model_language = 1
+                    model_to_train2.fit_generator(trains_gen[1],
+                                                steps_per_epoch=states[1]['n_iterations_per_epoch'],
+                                                epochs=1,
+                                                verbose=params['verbose'],
+                                                callbacks=multi_callbacks[1],
+                                                validation_data=vals_gen[1],
+                                                validation_steps=n_valid_samples,
+                                                class_weight=class_weight,
+                                                max_queue_size=params['n_parallel_loaders'],
+                                                workers=1,
+                                                initial_epoch=0)
 
                                 
     def __train_from_samples(self, x, y, params, class_weight=None, sample_weight=None):
