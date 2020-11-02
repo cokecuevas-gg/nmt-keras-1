@@ -1,7 +1,5 @@
 # NMT-Keras Multilingüe
 Esta es una versión modificada para la construcción de modelos de traducción automática con 1 lengua de origen y 2 de destino.
-## Tabla de Contenidos
-
 
 ## Bibliografía
 
