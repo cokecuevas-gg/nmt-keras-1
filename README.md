@@ -1,6 +1,13 @@
 # NMT-Keras Multilingüe
 Esta es una versión modificada para la construcción de modelos de traducción automática con 1 lengua de origen y 2 de destino.
 
+Decodificación: 
+--dataset_number: 0 para la primera lengua y 1 para la segunda lengua.
+
+Ejemplo para un modelo que la segunda lengua es el francés:
+python  sample_ensemble.py --models trained_model/epoch_28_1 --dataset  datasets/Dataset.pkl --text datasets/test.fr.en --dest hyp.test.fr --dataset_number 1
+
+
 ## Bibliografía
 
 Álvaro Peris and Francisco Casacuberta. [NMT-Keras: a Very Flexible Toolkit with
